@@ -10,11 +10,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -26,37 +25,43 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("JavaFX Welcome");
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        // Create tabs in the application and do not let the user close them.
+        TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        // Login pane creation. This will be inserted into the TabPane.
+        GridPane loginPane = new GridPane();
+        loginPane.setAlignment(Pos.CENTER);
+        loginPane.setHgap(10);
+        loginPane.setVgap(10);
+        loginPane.setPadding(new Insets(25, 25, 25, 25));
 
         Text scenetitle = new Text("Welcome");
         scenetitle.setId("welcome-text");
-        grid.add(scenetitle, 0, 0, 2, 1);
+        loginPane.add(scenetitle, 0, 0, 2, 1);
 
         Label userName = new Label("User Name:");
-        grid.add(userName, 0, 1);
+        loginPane.add(userName, 0, 1);
 
         TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
+        loginPane.add(userTextField, 1, 1);
 
         Label pw = new Label("Password:");
-        grid.add(pw, 0, 2);
+        loginPane.add(pw, 0, 2);
 
         PasswordField pwBox = new PasswordField();
-        grid.add(pwBox, 1, 2);
+        loginPane.add(pwBox, 1, 2);
 
         Button btn = new Button("Sign in");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(btn);
-        grid.add(hbBtn, 1, 4);
+        loginPane.add(hbBtn, 1, 4);
 
         final Text actiontarget = new Text();
         actiontarget.setId("actiontarget");
-        grid.add(actiontarget, 1, 6);
+        loginPane.add(actiontarget, 1, 6);
 
         btn.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -66,7 +71,25 @@ public class Main extends Application {
             }
         });
 
-        Scene scene = new Scene(grid, 300, 275);
+        // Create a new tab, insert the login pane, then add it to the TabPane.
+        Tab loginTab = new Tab();
+        loginTab.setText("Login");
+        loginTab.setContent(loginPane);
+        loginTab.setClosable(false);
+        tabPane.getTabs().add(loginTab);
+
+        // Create the second tab. (This is blank for now)
+        Tab tab2 = new Tab();
+        tab2.setText("Tab 2");
+        tabPane.getTabs().add(tab2);
+
+        // Create the third tab. (This is blank for now)
+        Tab tab3 = new Tab();
+        tab3.setText("Tab 3");
+        tabPane.getTabs().add(tab3);
+
+        // Create and show the scene from the TabPane.
+        Scene scene = new Scene(tabPane, 300, 275);
         primaryStage.setScene(scene);
         scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
         primaryStage.show();
