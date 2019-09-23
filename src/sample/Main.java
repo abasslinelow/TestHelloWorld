@@ -17,6 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.sql.*;
+
 public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -93,5 +95,50 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
         primaryStage.show();
+
+        try {
+            Class.forName ("org.h2.Driver");
+            Connection conn = DriverManager.getConnection ("jdbc:h2:./test", "sa","sa");
+            Statement st = conn.createStatement();
+
+            /*
+            System.out.println("Creating table...");
+            String sql = "CREATE TABLE TEST (uid INT PRIMARY KEY, fname VARCHAR(255), lname VARCHAR(255))";
+            st.executeUpdate(sql);
+            System.out.println("Created table.");
+            */
+
+            /*
+            System.out.println("Inserting records into table...");
+            sql = "INSERT INTO TEST VALUES (1, 'Todd', 'Bauer')";
+            st.executeUpdate(sql);
+            System.out.println("Inserted records into table.");
+            */
+
+            /*
+            System.out.println("Executing query...");
+            sql = "SELECT * FROM TEST";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                System.out.println("UID: " + rs.getInt("uid") + " First Name: " +
+                        rs.getString("fname") + " Last Name: " +
+                        rs.getString("lname"));
+            }
+            System.out.println("Executed query.");
+            */
+
+            /*
+            System.out.println("Listing column names and their data types...");
+            String sql = "SELECT COLUMN_NAME, TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TEST'";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                System.out.println("1: " + rs.getString(1) + " 2: " + rs.getString(2));
+            }
+            System.out.println("Listed column names and their data types.");
+            */
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
