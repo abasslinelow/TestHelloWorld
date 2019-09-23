@@ -26,6 +26,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+
         primaryStage.setTitle("JavaFX Welcome");
 
         // Create tabs in the application and do not let the user close them.
@@ -55,23 +56,17 @@ public class Main extends Application {
         PasswordField pwBox = new PasswordField();
         loginPane.add(pwBox, 1, 2);
 
+        // Create the login button.
         Button btn = new Button("Sign in");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(btn);
         loginPane.add(hbBtn, 1, 4);
 
+        // Create a text label for printing errors and confirmations.
         final Text actiontarget = new Text();
         actiontarget.setId("actiontarget");
-        loginPane.add(actiontarget, 1, 6);
-
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent e) {
-                actiontarget.setText("Sign in button pressed");
-            }
-        });
+        loginPane.add(actiontarget, 1, 5);
 
         // Create a new tab, insert the login pane, then add it to the TabPane.
         Tab loginTab = new Tab();
@@ -90,55 +85,83 @@ public class Main extends Application {
         tab3.setText("Tab 3");
         tabPane.getTabs().add(tab3);
 
+        // When the user clicks the login button, connect to the database
+        // and attempt to execute SQL statements.
+        btn.setOnAction(event -> {
+
+            String user = userTextField.getText();
+            String pword = pwBox.getText();
+
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            // NOTE: USERNAME/PASSWORD IS sa/sa ! This was the default username, and since security
+            // is not a concern with this project, I duplicated it as the password for convenience.
+            try {
+                Class.forName ("org.h2.Driver");
+                conn = DriverManager.getConnection ("jdbc:h2:./test", user, pword);
+
+                /*
+                System.out.println("Creating table...");
+                ps = conn.prepareStatement("CREATE TABLE TEST (uid INT PRIMARY KEY, " +
+                        "fname VARCHAR(255), lname VARCHAR(255))");
+                ps.executeUpdate();
+                System.out.println("Created table.");
+                */
+                /*
+                System.out.println("Inserting records into table...");
+                ps = conn.prepareStatement("INSERT INTO TEST VALUES (1, 'Todd', 'Bauer')";
+                ps.executeUpdate();
+                System.out.println("Inserted records into table.");
+                */
+                /*
+                System.out.println("Listing column names and their data types...");
+                ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM " +
+                        "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TEST'")
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    System.out.println("1: " + rs.getString(1) + " 2: " + rs.getString(2));
+                }
+                System.out.println("Listed column names and their data types.");
+                */
+
+                // Get all rows from the TEST table.
+                System.out.println("Executing query...");
+                ps = conn.prepareStatement("SELECT * FROM TEST");
+                rs = ps.executeQuery();
+                while (rs.next()) {
+                    System.out.println("UID: " + rs.getInt("uid") + ", First Name: " +
+                            rs.getString("fname") + ", Last Name: " +
+                            rs.getString("lname"));
+                }
+                System.out.println("Executed query.");
+
+                // If no exception was thrown, let the user know the action was successful.
+                actiontarget.setText("Database connection successful.");
+
+            // Cover cases where a connection could not be made or an SQL statement could
+            // not be executed.
+            } catch (ClassNotFoundException | SQLException e) {
+                e.printStackTrace();
+                actiontarget.setText("Database connection failed.\nCheck name and password.");
+
+            // Finally, close all objects to tidy up.
+            } finally {
+                try { if (rs != null) rs.close(); } catch (Exception e) {
+                    actiontarget.setText("Error closing ResultSet.");
+                } try { if (ps != null) ps.close(); } catch (Exception e) {
+                    actiontarget.setText("Error closing PreparedStatement.");
+                } try { if (conn != null) conn.close(); } catch (Exception e) {
+                    actiontarget.setText("Error closing Connection.");
+                }
+            }
+        });
+
         // Create and show the scene from the TabPane.
         Scene scene = new Scene(tabPane, 300, 275);
         primaryStage.setScene(scene);
         scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
         primaryStage.show();
-
-        try {
-            Class.forName ("org.h2.Driver");
-            Connection conn = DriverManager.getConnection ("jdbc:h2:./test", "sa","sa");
-            Statement st = conn.createStatement();
-
-            /*
-            System.out.println("Creating table...");
-            String sql = "CREATE TABLE TEST (uid INT PRIMARY KEY, fname VARCHAR(255), lname VARCHAR(255))";
-            st.executeUpdate(sql);
-            System.out.println("Created table.");
-            */
-
-            /*
-            System.out.println("Inserting records into table...");
-            sql = "INSERT INTO TEST VALUES (1, 'Todd', 'Bauer')";
-            st.executeUpdate(sql);
-            System.out.println("Inserted records into table.");
-            */
-
-            /*
-            System.out.println("Executing query...");
-            sql = "SELECT * FROM TEST";
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                System.out.println("UID: " + rs.getInt("uid") + " First Name: " +
-                        rs.getString("fname") + " Last Name: " +
-                        rs.getString("lname"));
-            }
-            System.out.println("Executed query.");
-            */
-
-            /*
-            System.out.println("Listing column names and their data types...");
-            String sql = "SELECT COLUMN_NAME, TYPE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TEST'";
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
-                System.out.println("1: " + rs.getString(1) + " 2: " + rs.getString(2));
-            }
-            System.out.println("Listed column names and their data types.");
-            */
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
     }
 }
