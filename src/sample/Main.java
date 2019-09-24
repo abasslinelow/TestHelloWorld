@@ -86,72 +86,20 @@ public class Main extends Application {
         // and attempt to execute SQL statements.
         btn.setOnAction(event -> {
 
-            String user = userTextField.getText();
-            String pword = pwBox.getText();
+            // Create a new database manager object for database manipulation.
+            DBManager db = new DBManager(userTextField.getText(), pwBox.getText());
 
-            Connection conn = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-
-            // NOTE: USERNAME/PASSWORD IS sa/sa ! This was the default username, and since security
-            // is not a concern with this project, I duplicated it as the password for convenience.
-            try {
-                Class.forName ("org.h2.Driver");
-                conn = DriverManager.getConnection ("jdbc:h2:./test", user, pword);
-
-                /*
-                System.out.println("Creating table...");
-                ps = conn.prepareStatement("CREATE TABLE TEST (uid INT PRIMARY KEY, " +
-                        "fname VARCHAR(255), lname VARCHAR(255))");
-                ps.executeUpdate();
-                System.out.println("Created table.");
-                */
-                /*
-                System.out.println("Inserting records into table...");
-                ps = conn.prepareStatement("INSERT INTO TEST VALUES (1, 'Todd', 'Bauer')";
-                ps.executeUpdate();
-                System.out.println("Inserted records into table.");
-                */
-                /*
-                System.out.println("Listing column names and their data types...");
-                ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM " +
-                        "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'TEST'")
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    System.out.println("1: " + rs.getString(1) + " 2: " + rs.getString(2));
-                }
-                System.out.println("Listed column names and their data types.");
-                */
-
-                // Get all rows from the TEST table.
-                System.out.println("Executing query...");
-                ps = conn.prepareStatement("SELECT * FROM TEST");
-                rs = ps.executeQuery();
-                while (rs.next()) {
-                    System.out.println("UID: " + rs.getInt("uid") + ", First Name: " +
-                            rs.getString("fname") + ", Last Name: " +
-                            rs.getString("lname"));
-                }
-                System.out.println("Executed query.");
-
-                // If no exception was thrown, let the user know the action was successful.
-                actiontarget.setText("Database connection successful.");
-
-            // Cover cases where a connection could not be made or an SQL statement could
-            // not be executed.
-            } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
-                actiontarget.setText("Database connection failed.\nCheck name and password.");
-
-            // Finally, close all objects to tidy up.
-            } finally {
-                try { if (rs != null) rs.close(); } catch (Exception e) {
-                    actiontarget.setText("Error closing ResultSet.");
-                } try { if (ps != null) ps.close(); } catch (Exception e) {
-                    actiontarget.setText("Error closing PreparedStatement.");
-                } try { if (conn != null) conn.close(); } catch (Exception e) {
-                    actiontarget.setText("Error closing Connection.");
-                }
+            // If a connection was established, run some SQL queries to test function.
+            // Else, inform the user that a connection could not be made.
+            if (db.getConnectionStatus()) {
+                //db.createTable("TEST");
+                //db.insertRowIntoTestTable(3, "Bill", "Burr");
+                db.listRowsInTable("TEST");
+                db.listColumnNamesInTable("TEST");
+                db.disconnectFromDB();
+                actiontarget.setText("Connection successful.");
+            } else {
+                actiontarget.setText("Connection failed.\nCheck name and password.");
             }
         });
 
