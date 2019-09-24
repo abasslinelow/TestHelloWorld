@@ -8,7 +8,7 @@ public class DBManager {
     private PreparedStatement ps = null;
     private ResultSet rs = null;
     private boolean isConnectedToDB;
-    protected boolean getConnectionStatus() {return isConnectedToDB;}
+    boolean getConnectionStatus() {return isConnectedToDB;}
 
     private String user;
     private String pword;
@@ -36,7 +36,7 @@ public class DBManager {
     }
 
     // List all of the rows in a given table.
-    protected void listRowsInTable(String tableName) {
+    void listRowsInTable(String tableName) {
         try {
             // Get all rows from the specified table.
             System.out.println("Executing query...");
@@ -57,7 +57,7 @@ public class DBManager {
     }
 
     // Close all objects to tidy up.
-    protected void disconnectFromDB() {
+    void disconnectFromDB() {
             try { if (rs != null) rs.close(); } catch (Exception e) {
                 System.out.print("Error closing ResultSet.");
                 e.printStackTrace();
@@ -75,7 +75,7 @@ public class DBManager {
 
     // Create a new table with the specified name. For now, this makes a
     // predetermined table with 3 columns: UID, first name, and last name.
-    protected void createTable(String tableName) {
+    void createTable(String tableName) {
         System.out.println("Creating table...");
 
         try {
@@ -91,7 +91,7 @@ public class DBManager {
     }
 
     // Insert new rows into the TEST table.
-    protected void insertRowIntoTestTable(int uid, String firstName, String lastName) {
+    void insertRowIntoTestTable(int uid, String firstName, String lastName) {
 
         System.out.println("Inserting records into table...");
         try {
@@ -106,7 +106,7 @@ public class DBManager {
     }
 
     // Retrieves and prints the columns names (and their data types) in the TEST table.
-    protected void listColumnNamesInTable(String tableName) {
+    void listColumnNamesInTable(String tableName) {
         try {
             System.out.println("Listing column names and their data types...");
             ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM " +
