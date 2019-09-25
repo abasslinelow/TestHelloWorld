@@ -23,12 +23,23 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * This class includes the main loop of the application. It also defines all GUI elements.
+ */
 public class Main extends Application {
 
+  /**
+   * This constructor launches the main loop with any argument given by the user.
+   * @param args An argument passed to the program on runtime.
+   */
   public static void main(String[] args) {
     launch(args);
   }
 
+  /**
+   * This method creates the GUI elements and serves as the main loop.
+   * @param primaryStage The Stage object to create GUI elements on.
+   */
   @Override
   public void start(Stage primaryStage) {
 

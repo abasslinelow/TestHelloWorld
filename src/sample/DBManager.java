@@ -15,18 +15,25 @@ import java.sql.*;
  */
 public class DBManager {
 
+  /**
+   * The connection to the database.
+   */
   private Connection conn = null;
+
+  /**
+   * A prepared SQL statement to inject into the database.
+   */
   private PreparedStatement ps = null;
+
+  /**
+   * An object to hold the results of a SQL query.
+   */
   private ResultSet rs = null;
 
   /**
-   * This attribute tracks if the program is connected to a database.
+   * Tracks if the program is connected to a database.
    */
   private boolean isConnectedToDB;
-
-  boolean getConnectionStatus() {
-    return isConnectedToDB;
-  }
 
   /**
    * Holds the user name for the database connection.
@@ -39,8 +46,14 @@ public class DBManager {
   private String pword;
 
   /**
-   * Default constructor. This gets a username and password from the user, then stores
-   * those values to the class. Finally, it attempts to connect to the database.
+   * Getter for the connection status.
+   * @return Returns a boolean that is true if connected to the database and false if not.
+   */
+  boolean getConnectionStatus() {return isConnectedToDB;}
+
+  /**
+   * Default constructor. This accepts the username and password for a database connection,
+   * then stores those values in the class. Finally, it attempts to connect to the database.
    * @param user  Holds the username for the database
    * @param pword Holds the password for the database
    */
@@ -72,6 +85,7 @@ public class DBManager {
   /**
    * Create a new table with the specified name. For now, this makes a
    * predetermined table with 3 columns: UID, first name, and last name.
+   * @param tableName Holds the name of the table to be accessed.
    */
   void createTable(String tableName) {
     System.out.println("Creating table...");
