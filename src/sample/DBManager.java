@@ -84,22 +84,22 @@ public class DBManager {
 
   /**
    * Create a new table with the specified name. For now, this makes a
-   * predetermined table with 3 columns: UID, first name, and last name.
+   * predetermined table with 4 columns: id, name, manufacturer, and type.
    * @param tableName Holds the name of the table to be accessed.
    */
   void createTable(String tableName) {
     System.out.println("Creating table...");
 
     try {
-      ps = conn.prepareStatement("CREATE TABLE " + tableName + " (uid INT PRIMARY KEY, " +
-          "fname VARCHAR(255), lname VARCHAR(255))");
+      ps = conn.prepareStatement("CREATE TABLE " + tableName + " (id INT PRIMARY KEY, " +
+          "name VARCHAR(255), manufacturer VARCHAR(255), type VARCHAR(255))");
       ps.executeUpdate();
+      System.out.println("Created table.");
     } catch (SQLException e) {
       e.printStackTrace();
       System.out.print("Could not execute query.");
     }
 
-    System.out.println("Created table.");
   }
 
   /**
@@ -116,9 +116,10 @@ public class DBManager {
 
       // Print the results of the query.
       while (rs.next()) {
-        System.out.println("UID: " + rs.getInt("uid") + ", First Name: " +
-            rs.getString("fname") + ", Last Name: " +
-            rs.getString("lname"));
+        System.out.println("ID: " + rs.getInt("id") +
+            ", Name: " + rs.getString("name") +
+            ", Manufacturer: " + rs.getString("manufacturer") +
+            ", Type: " + rs.getString("type"));
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -128,16 +129,18 @@ public class DBManager {
 
   /**
    * Insert new rows into the TEST table.
-   * @param uid The universal ID number of the row entry.
-   * @param firstName The first name of the person represented in the row entry.
-   * @param lastName  The last name of the person represented in the row entry.
+   * @param id The unique ID number of the row entry.
+   * @param name The name of the product in the row entry.
+   * @param manufacturer  The manufacturer of the product in the row entry.
+   * @param type The "type" of the product in the row entry (see ItemType enum).
    */
-  void insertRowIntoTestTable(int uid, String firstName, String lastName) {
+  void insertRowIntoTestTable(int id, String name, String manufacturer, String type) {
 
     System.out.println("Inserting records into table...");
     try {
-      ps = conn.prepareStatement("INSERT INTO TEST VALUES (" + uid + ", '" +
-          firstName + "', " + "'" + lastName + "')");
+      ps = conn.prepareStatement("INSERT INTO PRODUCTS VALUES (" + id + ", '" +
+          name + "', '" + manufacturer + "', '" + type + "')");
+
       ps.executeUpdate();
       System.out.println("Inserted records into table.");
     } catch (SQLException e) {
@@ -163,7 +166,7 @@ public class DBManager {
       System.out.println("Listed column names and their data types.");
     } catch (SQLException e) {
       e.printStackTrace();
-      System.out.println("Could not retrieve column information.");
+      System.out.println("Could not retrieve column information.\n");
     }
   }
 
@@ -176,7 +179,7 @@ public class DBManager {
             rs.close();
         }
     } catch (Exception e) {
-      System.out.print("Error closing ResultSet.");
+      System.out.print("Error closing ResultSet.\n");
       e.printStackTrace();
     }
     try {
@@ -184,7 +187,7 @@ public class DBManager {
             ps.close();
         }
     } catch (Exception e) {
-      System.out.print("Error closing PreparedStatement.");
+      System.out.print("Error closing PreparedStatement.\n");
       e.printStackTrace();
     }
     try {
@@ -192,11 +195,11 @@ public class DBManager {
             conn.close();
         }
     } catch (Exception e) {
-      System.out.print("Error closing Connection.");
+      System.out.print("Error closing Connection.\n");
       e.printStackTrace();
     }
 
     isConnectedToDB = false;
-    System.out.print("Connection successfully closed.");
+    System.out.print("Connection successfully closed.\n");
   }
 }

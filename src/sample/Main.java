@@ -1,18 +1,13 @@
-/*
-9/24/2019
-Created by: Todd Bauer
-
-This program is a simple JavaFX program with 3 tabs and the ability to connect to a
-database and execute SQL statements.
- */
-
 package sample;
 
+import java.util.ArrayList;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
@@ -22,14 +17,27 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 /**
- * This class includes the main loop of the application. It also defines all GUI elements.
+ * This program is a simple JavaFX program with 3 tabs and the ability to connect to a
+ * database and execute SQL statements.
+ * @author Todd Bauer
+ * @since 9/24/2019
  */
+
 public class Main extends Application {
 
   /**
-   * This constructor launches the main loop with any argument given by the user.
+   * This holds a list of all products.
+   */
+  private ArrayList<Product> productLine = new ArrayList<>();
+
+  /**
+   * This holds a list of all production runs.
+   */
+  private ArrayList<Production> productionRun = new ArrayList<>();
+
+  /**
+   * This launches the main loop with any argument given by the user.
    * @param args An argument passed to the program on runtime.
    */
   public static void main(String[] args) {
@@ -49,6 +57,35 @@ public class Main extends Application {
     TabPane tabPane = new TabPane();
     tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
+    // Create a new tab, insert the login pane, then add it to the TabPane.
+    Tab loginTab = new Tab();
+    loginTab.setText("Login");
+    loginTab.setContent(CreateLoginPane());
+    loginTab.setClosable(false);
+    tabPane.getTabs().add(loginTab);
+
+    // Create the second tab, insert the products pane, then add it to the TabPane.
+    Tab productTab = new Tab();
+    productTab.setText("Products");
+    productTab.setContent(CreateProductPane());
+    productTab.setClosable(false);
+    tabPane.getTabs().add(productTab);
+
+    // Create the third tab, insert the production pane, then add it to the TabPane.
+    Tab productionTab = new Tab();
+    productionTab.setText("Production");
+    productionTab.setContent(CreateProductionPane());
+    productionTab.setClosable(false);
+    tabPane.getTabs().add(productionTab);
+
+    // Create and show the scene from the TabPane.
+    Scene scene = new Scene(tabPane, 300, 275);
+    primaryStage.setScene(scene);
+    scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
+    primaryStage.show();
+  }
+
+  private GridPane CreateLoginPane() {
     // Login pane creation. This will be inserted into the TabPane.
     GridPane loginPane = new GridPane();
     loginPane.setAlignment(Pos.CENTER);
@@ -84,23 +121,6 @@ public class Main extends Application {
     actiontarget.setId("actiontarget");
     loginPane.add(actiontarget, 1, 5);
 
-    // Create a new tab, insert the login pane, then add it to the TabPane.
-    Tab loginTab = new Tab();
-    loginTab.setText("Login");
-    loginTab.setContent(loginPane);
-    loginTab.setClosable(false);
-    tabPane.getTabs().add(loginTab);
-
-    // Create the second tab. (This is blank for now)
-    Tab tab2 = new Tab();
-    tab2.setText("Tab 2");
-    tabPane.getTabs().add(tab2);
-
-    // Create the third tab. (This is blank for now)
-    Tab tab3 = new Tab();
-    tab3.setText("Tab 3");
-    tabPane.getTabs().add(tab3);
-
     // When the user clicks the login button, connect to the database
     // and attempt to execute SQL statements.
     btn.setOnAction(event -> {
@@ -111,10 +131,10 @@ public class Main extends Application {
       // If a connection was established, run some SQL queries to test function.
       // Else, inform the user that a connection could not be made.
       if (db.getConnectionStatus()) {
-        //db.createTable("TEST");
-        //db.insertRowIntoTestTable(3, "Bill", "Burr");
-        db.listRowsInTable("TEST");
-        db.listColumnNamesInTable("TEST");
+        //db.createTable("Products");
+        //db.insertRowIntoTestTable(1, "iPod", "Apple", "AM");
+        db.listRowsInTable("Products");
+        db.listColumnNamesInTable("PRODUCTS");
         db.disconnectFromDB();
         actiontarget.setText("Connection successful.");
       } else {
@@ -122,10 +142,99 @@ public class Main extends Application {
       }
     });
 
-    // Create and show the scene from the TabPane.
-    Scene scene = new Scene(tabPane, 300, 275);
-    primaryStage.setScene(scene);
-    scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
-    primaryStage.show();
+    return loginPane;
+  }
+
+  private GridPane CreateProductPane() {
+    // productPane pane creation. This will be inserted into the TabPane.
+    GridPane productPane = new GridPane();
+    productPane.setAlignment(Pos.CENTER);
+    productPane.setHgap(10);
+    productPane.setVgap(10);
+    productPane.setPadding(new Insets(25, 25, 25, 25));
+
+    Text scenetitle = new Text("Products");
+    scenetitle.setId("welcome-text");
+    productPane.add(scenetitle, 0, 0, 2, 1);
+
+    // Product name textfield.
+    Label productNameLabel = new Label("Product Name:");
+    productPane.add(productNameLabel, 0, 1);
+    TextField productNameTextfield = new TextField();
+    productPane.add(productNameTextfield, 1, 1);
+
+    // Product manufacturer textfield.
+    Label productManufacturerLabel = new Label("Manufacturer:");
+    productPane.add(productManufacturerLabel, 0, 2);
+    TextField productManufacturerTextfield = new TextField();
+    productPane.add(productManufacturerTextfield, 1, 2);
+
+    // Product type selector.
+    Label productTypeLabel = new Label("Product Type:");
+    productPane.add(productTypeLabel, 0, 3);
+    ComboBox<ItemType> productTypeCBox =
+        new ComboBox<>(FXCollections.observableArrayList(ItemType.values()) );
+
+
+    productPane.add(productTypeCBox, 1, 3);
+
+    // Create the Add Product button.
+    Button addProductBtn = new Button("Add Product");
+    HBox hbAddProductBtn = new HBox(10);
+    hbAddProductBtn.setAlignment(Pos.BOTTOM_RIGHT);
+    hbAddProductBtn.getChildren().add(addProductBtn);
+    productPane.add(hbAddProductBtn, 1, 4);
+
+    // Create a text label for printing errors and confirmations.
+    final Text actiontarget = new Text();
+    actiontarget.setId("actiontarget");
+    productPane.add(actiontarget, 0, 4);
+
+    addProductBtn.setOnAction(event -> {
+
+      Widget userWidget = new Widget(productNameTextfield.getText());
+      userWidget.setManufacturer(productManufacturerTextfield.getText());
+      productLine.add(userWidget);
+
+      // Create a new database manager object for database manipulation.
+      DBManager db = new DBManager("sa", "sa");
+
+      if (db.getConnectionStatus()) {
+
+        db.insertRowIntoTestTable(3, userWidget.getName(),
+            userWidget.getManufacturer(), productTypeCBox.getValue().type);
+
+        db.listRowsInTable("PRODUCTS");
+        db.listColumnNamesInTable("PRODUCTS");
+        db.disconnectFromDB();
+        actiontarget.setText("Connection successful.");
+      } else {
+        actiontarget.setText("Connection failed.\nCheck name and password.");
+      }
+    });
+
+    return productPane;
+  }
+
+  private GridPane CreateProductionPane() {
+
+    // productionPane pane creation. This will be inserted into the TabPane.
+    GridPane productionPane = new GridPane();
+    productionPane.setAlignment(Pos.CENTER);
+    productionPane.setHgap(10);
+    productionPane.setVgap(10);
+    productionPane.setPadding(new Insets(25, 25, 25, 25));
+
+    Text scenetitle = new Text("Production");
+    scenetitle.setId("welcome-text");
+    productionPane.add(scenetitle, 0, 0, 2, 1);
+
+    // Product name textfield.
+    Label productionQuantityLabel = new Label("Product Name:");
+    productionPane.add(productionQuantityLabel, 0, 1);
+    TextField productQuantityTextfield = new TextField();
+    productionPane.add(productQuantityTextfield, 1, 1);
+
+    return productionPane;
   }
 }
