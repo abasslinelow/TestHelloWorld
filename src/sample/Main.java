@@ -1,5 +1,6 @@
 package sample;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -51,6 +52,8 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) {
 
+    populateLists();
+
     primaryStage.setTitle("JavaFX Welcome");
 
     // Create tabs in the application and do not let the user close them.
@@ -60,21 +63,21 @@ public class Main extends Application {
     // Create a new tab, insert the login pane, then add it to the TabPane.
     Tab loginTab = new Tab();
     loginTab.setText("Login");
-    loginTab.setContent(CreateLoginPane());
+    loginTab.setContent(createLoginPane());
     loginTab.setClosable(false);
     tabPane.getTabs().add(loginTab);
 
     // Create the second tab, insert the products pane, then add it to the TabPane.
     Tab productTab = new Tab();
     productTab.setText("Products");
-    productTab.setContent(CreateProductPane());
+    productTab.setContent(createProductPane());
     productTab.setClosable(false);
     tabPane.getTabs().add(productTab);
 
     // Create the third tab, insert the production pane, then add it to the TabPane.
     Tab productionTab = new Tab();
     productionTab.setText("Production");
-    productionTab.setContent(CreateProductionPane());
+    productionTab.setContent(createProductionPane());
     productionTab.setClosable(false);
     tabPane.getTabs().add(productionTab);
 
@@ -85,7 +88,7 @@ public class Main extends Application {
     primaryStage.show();
   }
 
-  private GridPane CreateLoginPane() {
+  private GridPane createLoginPane() {
     // Login pane creation. This will be inserted into the TabPane.
     GridPane loginPane = new GridPane();
     loginPane.setAlignment(Pos.CENTER);
@@ -133,19 +136,19 @@ public class Main extends Application {
       if (db.getConnectionStatus()) {
         //db.createTable("Products");
         //db.insertRowIntoTestTable(1, "iPod", "Apple", "AM");
-        db.listRowsInTable("Products");
-        db.listColumnNamesInTable("PRODUCTS");
+        db.listRowsInProductsTable();
+        db.listColumnsInTable("PRODUCTS");
         db.disconnectFromDB();
-        actiontarget.setText("Connection successful.");
+        actiontarget.setText("Connection to db successful.");
       } else {
-        actiontarget.setText("Connection failed.\nCheck name and password.");
+        actiontarget.setText("Connection to db failed.\nCheck name and password.");
       }
     });
 
     return loginPane;
   }
 
-  private GridPane CreateProductPane() {
+  private GridPane createProductPane() {
     // productPane pane creation. This will be inserted into the TabPane.
     GridPane productPane = new GridPane();
     productPane.setAlignment(Pos.CENTER);
@@ -174,8 +177,6 @@ public class Main extends Application {
     productPane.add(productTypeLabel, 0, 3);
     ComboBox<ItemType> productTypeCBox =
         new ComboBox<>(FXCollections.observableArrayList(ItemType.values()) );
-
-
     productPane.add(productTypeCBox, 1, 3);
 
     // Create the Add Product button.
@@ -188,35 +189,35 @@ public class Main extends Application {
     // Create a text label for printing errors and confirmations.
     final Text actiontarget = new Text();
     actiontarget.setId("actiontarget");
-    productPane.add(actiontarget, 0, 4);
+    productPane.add(actiontarget, 0, 5, 2, 1);
 
     addProductBtn.setOnAction(event -> {
 
       Widget userWidget = new Widget(productNameTextfield.getText());
       userWidget.setManufacturer(productManufacturerTextfield.getText());
-      productLine.add(userWidget);
 
       // Create a new database manager object for database manipulation.
       DBManager db = new DBManager("sa", "sa");
 
       if (db.getConnectionStatus()) {
 
-        db.insertRowIntoTestTable(3, userWidget.getName(),
+        db.insertRowIntoProductTable(3, userWidget.getName(),
             userWidget.getManufacturer(), productTypeCBox.getValue().type);
+        productLine.add(userWidget);
 
-        db.listRowsInTable("PRODUCTS");
-        db.listColumnNamesInTable("PRODUCTS");
+        db.listRowsInProductsTable();
+        db.listColumnsInTable("PRODUCTS");
         db.disconnectFromDB();
-        actiontarget.setText("Connection successful.");
+        actiontarget.setText("Connection to db successful.");
       } else {
-        actiontarget.setText("Connection failed.\nCheck name and password.");
+        actiontarget.setText("Connection to db failed.\nCheck name and password.");
       }
     });
 
     return productPane;
   }
 
-  private GridPane CreateProductionPane() {
+  private GridPane createProductionPane() {
 
     // productionPane pane creation. This will be inserted into the TabPane.
     GridPane productionPane = new GridPane();
@@ -229,12 +230,88 @@ public class Main extends Application {
     scenetitle.setId("welcome-text");
     productionPane.add(scenetitle, 0, 0, 2, 1);
 
-    // Product name textfield.
-    Label productionQuantityLabel = new Label("Product Name:");
-    productionPane.add(productionQuantityLabel, 0, 1);
-    TextField productQuantityTextfield = new TextField();
-    productionPane.add(productQuantityTextfield, 1, 1);
+    // Product name ComboBox.
+    Label productionNameLabel = new Label("Product Name:");
+    productionPane.add(productionNameLabel, 0, 1);
+
+    // Rather than displaying the entire toString() of a product, just show its name.
+    ArrayList<String> names = new ArrayList<>();
+    for (Product p : productLine) { names.add(p.getName()); }
+    ComboBox<String> productionNameCBox =
+        new ComboBox<>(FXCollections.observableArrayList(names));
+
+    productionPane.add(productionNameCBox, 1, 1);
+
+    // Product quantity textfield.
+    Label productionQuantityLabel = new Label("Quantity:");
+    productionPane.add(productionQuantityLabel, 0, 2);
+    TextField productionQuantityTextfield = new TextField();
+    productionPane.add(productionQuantityTextfield, 1, 2);
+
+    // Create the Add Product button.
+    Button addProductionBtn = new Button("Add Product");
+    HBox hbAddProductionBtn = new HBox(10);
+    hbAddProductionBtn.setAlignment(Pos.BOTTOM_RIGHT);
+    hbAddProductionBtn.getChildren().add(addProductionBtn);
+    productionPane.add(hbAddProductionBtn, 1, 3);
+
+    // Create a text label for printing errors and confirmations.
+    final Text actiontarget = new Text();
+    actiontarget.setId("actiontarget");
+    productionPane.add(actiontarget, 0, 4, 2, 1);
+
+    addProductionBtn.setOnAction(event -> {
+
+      Production productionRecord;
+
+      // Find the Product in productLine that corresponds to the product name
+      // in the ComboBox, then use it to create a Production record.
+      for (Product product : productLine) {
+        if (product.getName().equals(productionNameCBox.getValue())) {
+          productionRecord = new Production(
+              product,
+              Integer.parseInt(productionQuantityTextfield.getText())
+          );
+          productionRun.add(productionRecord);
+
+          // Create a new database manager object for database manipulation.
+          DBManager db = new DBManager("sa", "sa");
+
+          if (db.getConnectionStatus()) {
+
+            db.insertRowIntoProductionTable(
+                3,
+                productionRecord.getName(),
+                productionRecord.getQuantity(),
+                productionRecord.getManufactureDate()
+            );
+
+            db.listRowsInProductionTable();
+
+            db.disconnectFromDB();
+
+            actiontarget.setText("Connection successful.");
+          } else {
+            actiontarget.setText("Connection to db failed.\nCheck name and password.");
+          }
+        }
+      }
+    });
 
     return productionPane;
+  }
+
+  /**
+   * Populates the productLine and productRun ArrayLists with information
+   * from the database.
+   */
+  private void populateLists() {
+
+    DBManager db = new DBManager("sa", "sa");
+    productLine = db.listRowsInProductsTable();
+    productionRun = db.listRowsInProductionTable();
+
+    System.out.print(productLine + "\n\n");
+    System.out.print(productionRun + "\n\n");
   }
 }

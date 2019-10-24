@@ -8,6 +8,8 @@ This file holds a class that allows the user to manage a database.
 package sample;
 
 import java.sql.*;
+import java.util.Date;
+import java.util.ArrayList;
 
 /**
  * This class manages all database activity including connecting to the
@@ -103,14 +105,15 @@ public class DBManager {
   }
 
   /**
-   * List all of the rows in a given table.
-   * @param tableName Holds the name of the table to be accessed.
+   * List all of the rows in the PRODUCTS table.
    */
-  void listRowsInTable(String tableName) {
+  ArrayList<Product> listRowsInProductsTable() {
+    ArrayList<Product> products = new ArrayList<>();
+
     try {
       // Get all rows from the specified table.
       System.out.println("Executing query...");
-      ps = conn.prepareStatement("SELECT * FROM " + tableName);
+      ps = conn.prepareStatement("SELECT * FROM PRODUCTS");
       rs = ps.executeQuery();
       System.out.println("Executed query.");
 
@@ -120,21 +123,73 @@ public class DBManager {
             ", Name: " + rs.getString("name") +
             ", Manufacturer: " + rs.getString("manufacturer") +
             ", Type: " + rs.getString("type"));
+        AudioPlayer player = new AudioPlayer(
+            rs.getString("name"),
+            rs.getString("manufacturer"),
+            rs.getString("type")
+        );
+        products.add(player);
       }
     } catch (SQLException e) {
       e.printStackTrace();
       System.out.print("Could not execute query.");
     }
+
+    return products;
   }
 
   /**
-   * Insert new rows into the TEST table.
+   * List all of the rows in the PRODUCTION table.
+   */
+  ArrayList<Production> listRowsInProductionTable() {
+    ArrayList<Production> productionRun = new ArrayList<>();
+
+    try {
+
+      // Get a list of all products. This is used to locate the product
+      // associated with this production.
+      ArrayList<Product> productLine = this.listRowsInProductsTable();
+
+      // Get all rows from the specified table.
+      System.out.println("Executing query...");
+      ps = conn.prepareStatement("SELECT * FROM PRODUCTION");
+      rs = ps.executeQuery();
+      System.out.println("Executed query.");
+
+      // Print the results of the query.
+      while (rs.next()) {
+        System.out.println("ID: " + rs.getInt("ID") +
+            ", Product Name: " + rs.getString("PRODUCT_NAME") +
+            ", Quantity: " + rs.getString("QUANTITY") +
+            ", Manufacture Date: " + rs.getTimestamp("MANUFACTURE_DATE"));
+
+        for (Product product : productLine) {
+          if (product.getName().equals(rs.getString("PRODUCT_NAME"))) {
+            Production production = new Production(
+                product,
+                rs.getInt("QUANTITY"),
+                rs.getTimestamp("MANUFACTURE_DATE")
+            );
+            productionRun.add(production);
+          }
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.out.print("Could not execute query.");
+    }
+
+    return productionRun;
+  }
+
+  /**
+   * Insert new rows into the PRODUCT table.
    * @param id The unique ID number of the row entry.
    * @param name The name of the product in the row entry.
    * @param manufacturer  The manufacturer of the product in the row entry.
    * @param type The "type" of the product in the row entry (see ItemType enum).
    */
-  void insertRowIntoTestTable(int id, String name, String manufacturer, String type) {
+  void insertRowIntoProductTable(int id, String name, String manufacturer, String type) {
 
     System.out.println("Inserting records into table...");
     try {
@@ -150,10 +205,37 @@ public class DBManager {
   }
 
   /**
+   * Insert new rows into the PRODUCTION table.
+   * @param id The unique ID number of the row entry.
+   * @param name The name of the product in the row entry.
+   * @param quantity  The amount of products that were manufactured.
+   * @param manufacturedOn The date and time the products were manufactured.
+   */
+  void insertRowIntoProductionTable(int id, String name, int quantity, Date manufacturedOn) {
+
+    System.out.println("Inserting records into table...");
+    try {
+      ps = conn.prepareStatement(
+          "INSERT INTO PRODUCTION VALUES (" +
+          id + ", '" +
+          name + "', '" +
+          quantity + "', '" +
+          new Timestamp(manufacturedOn.getTime()) + "')"
+      );
+
+      ps.executeUpdate();
+      System.out.println("Inserted records into table.");
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.out.println("Could not create record.");
+    }
+  }
+
+  /**
    * Retrieves and prints the columns names (and their data types) in the TEST table.
    * @param tableName Holds the name of the table to be accessed.
    */
-  void listColumnNamesInTable(String tableName) {
+  void listColumnsInTable(String tableName) {
     try {
       System.out.println("Listing column names and their data types...");
       ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM " +

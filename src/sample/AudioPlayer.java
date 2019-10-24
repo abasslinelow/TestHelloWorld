@@ -7,7 +7,15 @@ package sample;
  * attributes, it also had methods for controlling the media player's playback.
  */
 public class AudioPlayer extends Product implements MultimediaControl {
+
+  /**
+   * Specifies the audio type, See ItemType enum.
+   */
   private String audioSpecification;
+
+  /**
+   * Specifies the media type. See ItemType enum.
+   */
   private String mediaType;
 
   /**
