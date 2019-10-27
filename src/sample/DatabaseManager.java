@@ -7,15 +7,20 @@ This file holds a class that allows the user to manage a database.
 
 package sample;
 
-import java.sql.*;
-import java.util.Date;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
- * This class manages all database activity including connecting to the
+ * Manages all database activity including connecting to the
  * database and executing SQL statements.
  */
-public class DBManager {
+public class DatabaseManager {
 
   /**
    * The connection to the database.
@@ -51,7 +56,9 @@ public class DBManager {
    * Getter for the connection status.
    * @return Returns a boolean that is true if connected to the database and false if not.
    */
-  boolean getConnectionStatus() {return isConnectedToDB;}
+  boolean getConnectionStatus() {
+    return isConnectedToDB;
+  }
 
   /**
    * Default constructor. This accepts the username and password for a database connection,
@@ -59,7 +66,7 @@ public class DBManager {
    * @param user  Holds the username for the database
    * @param pword Holds the password for the database
    */
-  protected DBManager(String user, String pword) {
+  protected DatabaseManager(String user, String pword) {
     this.user = user;
     this.pword = pword;
     connectToDB();
@@ -73,7 +80,7 @@ public class DBManager {
     // NOTE: USERNAME/PASSWORD IS sa/sa ! This was the default username, and since security
     // is not a concern with this project, I duplicated it as the password for convenience.
     try {
-      // Establish a connection to the database and flag the DBManager as connected.
+      // Establish a connection to the database and flag the DatabaseManager as connected.
       Class.forName("org.h2.Driver");
       conn = DriverManager.getConnection("jdbc:h2:./test", user, pword);
       isConnectedToDB = true;
@@ -93,8 +100,10 @@ public class DBManager {
     System.out.println("Creating table...");
 
     try {
-      ps = conn.prepareStatement("CREATE TABLE " + tableName + " (id INT PRIMARY KEY, " +
-          "name VARCHAR(255), manufacturer VARCHAR(255), type VARCHAR(255))");
+      ps = conn.prepareStatement("CREATE TABLE "
+          + tableName
+          + " (id INT PRIMARY KEY, "
+          + "name VARCHAR(255), manufacturer VARCHAR(255), type VARCHAR(255))");
       ps.executeUpdate();
       System.out.println("Created table.");
     } catch (SQLException e) {
@@ -106,6 +115,7 @@ public class DBManager {
 
   /**
    * List all of the rows in the PRODUCTS table.
+   * @return ArrayList An ArrayList of Products that exist in the database.
    */
   ArrayList<Product> listRowsInProductsTable() {
     ArrayList<Product> products = new ArrayList<>();
@@ -119,10 +129,11 @@ public class DBManager {
 
       // Print the results of the query.
       while (rs.next()) {
-        System.out.println("ID: " + rs.getInt("id") +
-            ", Name: " + rs.getString("name") +
-            ", Manufacturer: " + rs.getString("manufacturer") +
-            ", Type: " + rs.getString("type"));
+        System.out.println("ID: "
+            + rs.getInt("id")
+            + ", Name: " + rs.getString("name")
+            + ", Manufacturer: " + rs.getString("manufacturer")
+            + ", Type: " + rs.getString("type"));
         AudioPlayer player = new AudioPlayer(
             rs.getString("name"),
             rs.getString("manufacturer"),
@@ -140,6 +151,7 @@ public class DBManager {
 
   /**
    * List all of the rows in the PRODUCTION table.
+   * @return ArrayList An ArrayList of Productions that exist in the database.
    */
   ArrayList<Production> listRowsInProductionTable() {
     ArrayList<Production> productionRun = new ArrayList<>();
@@ -158,10 +170,13 @@ public class DBManager {
 
       // Print the results of the query.
       while (rs.next()) {
-        System.out.println("ID: " + rs.getInt("ID") +
-            ", Product Name: " + rs.getString("PRODUCT_NAME") +
-            ", Quantity: " + rs.getString("QUANTITY") +
-            ", Manufacture Date: " + rs.getTimestamp("MANUFACTURE_DATE"));
+        System.out.println("ID: "
+            + rs.getInt("ID")
+            + ", Product Name: "
+            + rs.getString("PRODUCT_NAME")
+            + ", Quantity: "
+            + rs.getString("QUANTITY")
+            + ", Manufacture Date: " + rs.getTimestamp("MANUFACTURE_DATE"));
 
         for (Product product : productLine) {
           if (product.getName().equals(rs.getString("PRODUCT_NAME"))) {
@@ -193,8 +208,13 @@ public class DBManager {
 
     System.out.println("Inserting records into table...");
     try {
-      ps = conn.prepareStatement("INSERT INTO PRODUCTS VALUES (" + id + ", '" +
-          name + "', '" + manufacturer + "', '" + type + "')");
+      ps = conn.prepareStatement("INSERT INTO PRODUCTS VALUES ("
+          + id + ", '"
+          + name + "', '"
+          + manufacturer
+          + "', '"
+          + type
+          + "')");
 
       ps.executeUpdate();
       System.out.println("Inserted records into table.");
@@ -216,11 +236,12 @@ public class DBManager {
     System.out.println("Inserting records into table...");
     try {
       ps = conn.prepareStatement(
-          "INSERT INTO PRODUCTION VALUES (" +
-          id + ", '" +
-          name + "', '" +
-          quantity + "', '" +
-          new Timestamp(manufacturedOn.getTime()) + "')"
+          "INSERT INTO PRODUCTION VALUES ("
+          + id + ", '"
+          + name + "', '"
+          + quantity + "', '"
+          + new Timestamp(manufacturedOn.getTime())
+          + "')"
       );
 
       ps.executeUpdate();
@@ -232,14 +253,16 @@ public class DBManager {
   }
 
   /**
-   * Retrieves and prints the columns names (and their data types) in the TEST table.
+   * Retrieves and prints the columns names (and their data types) in a given table.
    * @param tableName Holds the name of the table to be accessed.
    */
   void listColumnsInTable(String tableName) {
     try {
       System.out.println("Listing column names and their data types...");
-      ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM " +
-          "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + tableName + "'");
+      ps = conn.prepareStatement("SELECT COLUMN_NAME, TYPE_NAME FROM "
+          + "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"
+          + tableName
+          + "'");
       rs = ps.executeQuery();
 
       while (rs.next()) {
@@ -257,25 +280,25 @@ public class DBManager {
    */
   void disconnectFromDB() {
     try {
-        if (rs != null) {
-            rs.close();
-        }
+      if (rs != null) {
+        rs.close();
+      }
     } catch (Exception e) {
       System.out.print("Error closing ResultSet.\n");
       e.printStackTrace();
     }
     try {
-        if (ps != null) {
-            ps.close();
-        }
+      if (ps != null) {
+        ps.close();
+      }
     } catch (Exception e) {
       System.out.print("Error closing PreparedStatement.\n");
       e.printStackTrace();
     }
     try {
-        if (conn != null) {
-            conn.close();
-        }
+      if (conn != null) {
+        conn.close();
+      }
     } catch (Exception e) {
       System.out.print("Error closing Connection.\n");
       e.printStackTrace();

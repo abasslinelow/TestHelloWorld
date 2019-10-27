@@ -1,6 +1,5 @@
 package sample;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -20,7 +19,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 /**
  * This program is a simple JavaFX program with 3 tabs and the ability to connect to a
- * database and execute SQL statements.
+ * database and execute SQL statements. It contains various objects that represent
+ * multimedia players and allows the user to catalog these products and their
+ * production runs.
  * @author Todd Bauer
  * @since 9/24/2019
  */
@@ -52,9 +53,11 @@ public class Main extends Application {
   @Override
   public void start(Stage primaryStage) {
 
+    // Populates the productLine and productionRun ArrayLists with their
+    // corresponding rows in the PRODUCT and PRODUCTION database tables.
     populateLists();
 
-    primaryStage.setTitle("JavaFX Welcome");
+    primaryStage.setTitle("Product Manager");
 
     // Create tabs in the application and do not let the user close them.
     TabPane tabPane = new TabPane();
@@ -129,7 +132,7 @@ public class Main extends Application {
     btn.setOnAction(event -> {
 
       // Create a new database manager object for database manipulation.
-      DBManager db = new DBManager(userTextField.getText(), pwBox.getText());
+      DatabaseManager db = new DatabaseManager(userTextField.getText(), pwBox.getText());
 
       // If a connection was established, run some SQL queries to test function.
       // Else, inform the user that a connection could not be made.
@@ -176,7 +179,7 @@ public class Main extends Application {
     Label productTypeLabel = new Label("Product Type:");
     productPane.add(productTypeLabel, 0, 3);
     ComboBox<ItemType> productTypeCBox =
-        new ComboBox<>(FXCollections.observableArrayList(ItemType.values()) );
+        new ComboBox<>(FXCollections.observableArrayList(ItemType.values()));
     productPane.add(productTypeCBox, 1, 3);
 
     // Create the Add Product button.
@@ -193,16 +196,19 @@ public class Main extends Application {
 
     addProductBtn.setOnAction(event -> {
 
-      Widget userWidget = new Widget(productNameTextfield.getText());
+      Widget userWidget = new Widget(
+          productNameTextfield.getText(),
+          productTypeCBox.getValue().type
+      );
       userWidget.setManufacturer(productManufacturerTextfield.getText());
 
       // Create a new database manager object for database manipulation.
-      DBManager db = new DBManager("sa", "sa");
+      DatabaseManager db = new DatabaseManager("sa", "sa");
 
       if (db.getConnectionStatus()) {
 
         db.insertRowIntoProductTable(3, userWidget.getName(),
-            userWidget.getManufacturer(), productTypeCBox.getValue().type);
+            userWidget.getManufacturer(), userWidget.getType());
         productLine.add(userWidget);
 
         db.listRowsInProductsTable();
@@ -236,7 +242,9 @@ public class Main extends Application {
 
     // Rather than displaying the entire toString() of a product, just show its name.
     ArrayList<String> names = new ArrayList<>();
-    for (Product p : productLine) { names.add(p.getName()); }
+    for (Product p : productLine) {
+      names.add(p.getName());
+    }
     ComboBox<String> productionNameCBox =
         new ComboBox<>(FXCollections.observableArrayList(names));
 
@@ -275,7 +283,7 @@ public class Main extends Application {
           productionRun.add(productionRecord);
 
           // Create a new database manager object for database manipulation.
-          DBManager db = new DBManager("sa", "sa");
+          DatabaseManager db = new DatabaseManager("sa", "sa");
 
           if (db.getConnectionStatus()) {
 
@@ -307,7 +315,7 @@ public class Main extends Application {
    */
   private void populateLists() {
 
-    DBManager db = new DBManager("sa", "sa");
+    DatabaseManager db = new DatabaseManager("sa", "sa");
     productLine = db.listRowsInProductsTable();
     productionRun = db.listRowsInProductionTable();
 

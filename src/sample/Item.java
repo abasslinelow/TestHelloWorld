@@ -1,37 +1,38 @@
 package sample;
 
 /**
- * Defines a blueprint for all Product objects to be created. All products
- * must have an ID, a name, and a manufacturer.
+ * Dictates that all products must have methods for getting id,
+ * as well as getting and setting the product name and manufacturer.
+ * All Product objects to conform to this interface.
  */
 public interface Item {
 
   /**
-   * Getter for the ID number.
-   * @return Returns the ID number.
+   * Gets the ID number of the product.
+   * @return The ID number of the product.
    */
   int getId();
 
   /**
-   * Getter for the name of the product.
-   * @return Returns the name of the product.
+   * Gets the name of the product.
+   * @return The name of the product.
    */
   String getName();
 
   /**
-   * Setter for the name of the product.
+   * Sets the name of the product.
    * @param name The name of the product.
    */
   void setName(String name);
 
   /**
-   * Getter for the manufacturer of the product.
-   * @return Returns the manufacturer of the product.
+   * Gets the manufacturer of the product.
+   * @return The manufacturer of the product.
    */
   String getManufacturer();
 
   /**
-   * Setter for the manufacturer of the product.
+   * Sets the manufacturer of the product.
    * @param manufacturer The manufacturer of the product.
    */
   void setManufacturer(String manufacturer);

@@ -12,11 +12,11 @@ public class AudioPlayerDriver {
    */
   public static void main(String[] args) {
 
-    // Create a new AudioPlayer.
+    // Create a new AudioPlayer and set its type.
     AudioPlayer myPlayer = new AudioPlayer(
-        "iPad",
+        "iPod",
         "Apple",
-        "AudioMobile"
+        ItemType.AUDIO_MOBILE.type
         );
 
     // Test each function of the AudioPlayer to ensure functionality.
@@ -27,6 +27,7 @@ public class AudioPlayerDriver {
 
     // Print the details of the AudioPlayer to confirm attributes are
     // being stored properly.
+    System.out.print("\n");
     System.out.print(myPlayer.toString());
   }
 }
