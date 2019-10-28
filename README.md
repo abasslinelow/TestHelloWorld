@@ -5,3 +5,9 @@ This JavaFX program features 3 tabs and a "login" screen that connects to a data
 
 ## Author
 It was written by Todd Bauer in August - September of 2019.
+
+## Class Diagram
+![The class diagram](res/classes.png)
+
+## Database Diagram
+![The class diagram](res/database.png)
