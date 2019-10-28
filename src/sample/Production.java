@@ -1,11 +1,15 @@
 package sample;
 
 import java.util.Date;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * Represents a manufacturing production record of a product.
  */
-class Production {
+public class Production {
 
   /**
    * The product that was manufactured.
@@ -24,7 +28,8 @@ class Production {
 
   /**
    * Default constructor.
-   * @param product The manufactured product.
+   *
+   * @param product  The manufactured product.
    * @param quantity The quantity of the product that was manufactured.
    */
   Production(Product product, int quantity) {
@@ -35,8 +40,9 @@ class Production {
 
   /**
    * Overloaded constructor that accepts a predefined date.
-   * @param product A Product object containing the product that was manufactured.
-   * @param quantity The amount of product that was manufactured.
+   *
+   * @param product        A Product object containing the product that was manufactured.
+   * @param quantity       The amount of product that was manufactured.
    * @param manufacturedOn The time and date of production.
    */
   Production(Product product, int quantity, Date manufacturedOn) {
@@ -47,54 +53,61 @@ class Production {
 
   /**
    * Getter for the product name.
+   *
    * @return String The product name.
    */
-  String getName() {
+  public String getName() {
     return product.getName();
   }
 
   /**
    * Setter for the product name.
+   *
    * @param name The product name.
    */
-  void setName(String name) {
+  public void setName(String name) {
     product.setName(name);
   }
 
   /**
    * Getter for the production quantity.
+   *
    * @return int The amount of product that was manufactured.
    */
-  int getQuantity() {
+  public int getQuantity() {
     return quantity;
   }
 
   /**
    * Setter for the production quantity.
+   *
    * @param quantity The amount of product that was manufactured.
    */
-  void setQuantity(int quantity) {
+  public void setQuantity(int quantity) {
     this.quantity = quantity;
   }
 
   /**
    * Getter for the manufacture date.
+   *
    * @return Date The time and date of manufacturing.
    */
-  Date getManufactureDate() {
+  public Date getManufactureDate() {
     return manufacturedOn;
   }
 
   /**
    * Setter for the manufacture date.
+   *
    * @param manufacturedOn The time and date of manufacturing.
    */
-  void setManufactureDate(Date manufacturedOn) {
+  public void setManufactureDate(Date manufacturedOn) {
     this.manufacturedOn = manufacturedOn;
   }
 
   /**
    * Overrides the toString() method so it returns the values of all attributes.
+   *
    * @return String Contains a full description of the production in the following format
    * <br>Product Name:
    * <br>Quantity:

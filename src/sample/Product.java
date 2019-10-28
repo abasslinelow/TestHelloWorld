@@ -1,9 +1,9 @@
 package sample;
 
 /**
- * Contains a generic Product class that is used abstractly
- * as a template for specific products. See AudioPlayer and
- * MoviePlayer for examples of specific products.
+ * Contains a generic Product class that is used abstractly as a template for specific products. See
+ * AudioPlayer and MoviePlayer for examples of specific products.
+ *
  * @see AudioPlayer
  * @see MoviePlayer
  */
@@ -26,12 +26,14 @@ public abstract class Product implements Item {
 
   /**
    * The "type" of product - see ItemType enum.
+   *
    * @see ItemType
    */
   private String type;
 
   /**
    * Default constructor.
+   *
    * @param name The name of the product.
    */
   Product(String name) {
@@ -40,6 +42,7 @@ public abstract class Product implements Item {
 
   /**
    * Getter for the id of the product.
+   *
    * @return int The id of the product.
    */
   @Override
@@ -49,6 +52,7 @@ public abstract class Product implements Item {
 
   /**
    * Getter for the name of the product.
+   *
    * @return String The name of the product.
    */
   @Override
@@ -58,6 +62,7 @@ public abstract class Product implements Item {
 
   /**
    * Setter for the name of the product.
+   *
    * @param name The name of the product.
    */
   @Override
@@ -67,6 +72,7 @@ public abstract class Product implements Item {
 
   /**
    * Getter for the manufacturer of the product.
+   *
    * @return String The manufacturer of the product.
    */
   @Override
@@ -76,6 +82,7 @@ public abstract class Product implements Item {
 
   /**
    * Setter for the manufacturer of the product.
+   *
    * @param manufacturer The manufacturer of the product.
    */
   @Override
@@ -85,6 +92,7 @@ public abstract class Product implements Item {
 
   /**
    * Getter for the media type of the product.
+   *
    * @return String The media type of the product.
    */
   public String getType() {
@@ -93,6 +101,7 @@ public abstract class Product implements Item {
 
   /**
    * Setter for the media type of the product.
+   *
    * @param type The media type of the product.
    */
   public void setType(String type) {
@@ -101,19 +110,20 @@ public abstract class Product implements Item {
 
 
   /**
-   * Overrides the toString() method to display the details of an object
-   * that inherits the Product class. Display is in this form
+   * Overrides the toString() method to display the details of an object that inherits the Product
+   * class. Display is in this form
    * <br>Name:
    * <br>Manufacturer:
    * <br>Media Type:
+   *
    * @return String The complete formatted string description.
    */
   @Override
   public String toString() {
     return String.format(
         "Name: %s%n"
-        + "Manufacturer: %s%n"
-        + "Type: %s%n",
+            + "Manufacturer: %s%n"
+            + "Type: %s%n",
         name, manufacturer, type);
   }
 }

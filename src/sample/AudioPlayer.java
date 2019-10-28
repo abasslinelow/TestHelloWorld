@@ -1,32 +1,34 @@
 package sample;
 
 /**
- * An audio player. It stores the name, manufacturer, multimedia type, and
- * multimedia code that belong to the device (see ItemType enum). In addition
- * to these attributes, it has methods for controlling the audio player's
- * playback (see MultimediaControl interface).
+ * An audio player. It stores the name, manufacturer, multimedia type, and multimedia code that
+ * belong to the device (see ItemType enum). In addition to these attributes, it has methods for
+ * controlling the audio player's playback (see MultimediaControl interface).
+ *
  * @see ItemType
  * @see MultimediaControl
- *
  */
 public class AudioPlayer extends Product implements MultimediaControl {
 
   /**
    * Specifies the audio type.
+   *
    * @see ItemType
    */
   private String audioSpecification;
 
   /**
    * Specifies the media type.
+   *
    * @see ItemType
    */
   private String mediaType;
 
   /**
    * Default constructor.
-   * @param name The name of the product.
-   * @param manufacturer The manufacturer of the product.
+   *
+   * @param name               The name of the product.
+   * @param manufacturer       The manufacturer of the product.
    * @param audioSpecification The "type" of product (see ItemType enum)
    */
   AudioPlayer(String name, String manufacturer, String audioSpecification) {
@@ -83,6 +85,7 @@ public class AudioPlayer extends Product implements MultimediaControl {
    * <br>Manufacturer:
    * <br>Media Type:
    * <br>Audio Spec:
+   *
    * @return String Returns a String in the above format.
    */
   @Override

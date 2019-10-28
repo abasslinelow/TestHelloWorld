@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Manages all database activity including connecting to the
- * database and executing SQL statements.
+ * Manages all database activity including connecting to the database and executing SQL statements.
  */
 public class DatabaseManager {
 
@@ -54,6 +53,7 @@ public class DatabaseManager {
 
   /**
    * Getter for the connection status.
+   *
    * @return Returns a boolean that is true if connected to the database and false if not.
    */
   boolean getConnectionStatus() {
@@ -61,8 +61,9 @@ public class DatabaseManager {
   }
 
   /**
-   * Default constructor. This accepts the username and password for a database connection,
-   * then stores those values in the class. Finally, it attempts to connect to the database.
+   * Default constructor. This accepts the username and password for a database connection, then
+   * stores those values in the class. Finally, it attempts to connect to the database.
+   *
    * @param user  Holds the username for the database
    * @param pword Holds the password for the database
    */
@@ -92,8 +93,9 @@ public class DatabaseManager {
   }
 
   /**
-   * Create a new table with the specified name. For now, this makes a
-   * predetermined table with 4 columns: id, name, manufacturer, and type.
+   * Create a new table with the specified name. For now, this makes a predetermined table with 4
+   * columns: id, name, manufacturer, and type.
+   *
    * @param tableName Holds the name of the table to be accessed.
    */
   void createTable(String tableName) {
@@ -115,6 +117,7 @@ public class DatabaseManager {
 
   /**
    * List all of the rows in the PRODUCTS table.
+   *
    * @return ArrayList An ArrayList of Products that exist in the database.
    */
   ArrayList<Product> listRowsInProductsTable() {
@@ -151,6 +154,7 @@ public class DatabaseManager {
 
   /**
    * List all of the rows in the PRODUCTION table.
+   *
    * @return ArrayList An ArrayList of Productions that exist in the database.
    */
   ArrayList<Production> listRowsInProductionTable() {
@@ -183,7 +187,7 @@ public class DatabaseManager {
             Production production = new Production(
                 product,
                 rs.getInt("QUANTITY"),
-                rs.getTimestamp("MANUFACTURE_DATE")
+                new Date(rs.getTimestamp("MANUFACTURE_DATE").getTime())
             );
             productionRun.add(production);
           }
@@ -199,10 +203,11 @@ public class DatabaseManager {
 
   /**
    * Insert new rows into the PRODUCT table.
-   * @param id The unique ID number of the row entry.
-   * @param name The name of the product in the row entry.
-   * @param manufacturer  The manufacturer of the product in the row entry.
-   * @param type The "type" of the product in the row entry (see ItemType enum).
+   *
+   * @param id           The unique ID number of the row entry.
+   * @param name         The name of the product in the row entry.
+   * @param manufacturer The manufacturer of the product in the row entry.
+   * @param type         The "type" of the product in the row entry (see ItemType enum).
    */
   void insertRowIntoProductTable(int id, String name, String manufacturer, String type) {
 
@@ -226,9 +231,10 @@ public class DatabaseManager {
 
   /**
    * Insert new rows into the PRODUCTION table.
-   * @param id The unique ID number of the row entry.
-   * @param name The name of the product in the row entry.
-   * @param quantity  The amount of products that were manufactured.
+   *
+   * @param id             The unique ID number of the row entry.
+   * @param name           The name of the product in the row entry.
+   * @param quantity       The amount of products that were manufactured.
    * @param manufacturedOn The date and time the products were manufactured.
    */
   void insertRowIntoProductionTable(int id, String name, int quantity, Date manufacturedOn) {
@@ -237,11 +243,11 @@ public class DatabaseManager {
     try {
       ps = conn.prepareStatement(
           "INSERT INTO PRODUCTION VALUES ("
-          + id + ", '"
-          + name + "', '"
-          + quantity + "', '"
-          + new Timestamp(manufacturedOn.getTime())
-          + "')"
+              + id + ", '"
+              + name + "', '"
+              + quantity + "', '"
+              + new Timestamp(manufacturedOn.getTime())
+              + "')"
       );
 
       ps.executeUpdate();
@@ -254,6 +260,7 @@ public class DatabaseManager {
 
   /**
    * Retrieves and prints the columns names (and their data types) in a given table.
+   *
    * @param tableName Holds the name of the table to be accessed.
    */
   void listColumnsInTable(String tableName) {

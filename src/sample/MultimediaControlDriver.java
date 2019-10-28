@@ -1,21 +1,20 @@
 package sample;
 
 /**
- * Demonstrates polymorphism by showing that any class
- * implementing MultimediaControl can be instantiated, and that
- * the methods defined in MultimediaControl can be used regardless
- * of the class that implements it.
+ * Demonstrates polymorphism by showing that any class implementing MultimediaControl can be
+ * instantiated, and that the methods defined in MultimediaControl can be used regardless of the
+ * class that implements it.
  * <p>In this example, I create both an audio and video player. I
- * create an audio MultimediaControl object by instantiating it
- * with the AudioPlayer class. I do the same for the MoviePlayer
- * class. I then use the methods of both (which override the
- * methods in MultimediaControl) to demonstrate polymorphism.</p>
+ * create an audio MultimediaControl object by instantiating it with the AudioPlayer class. I do the
+ * same for the MoviePlayer class. I then use the methods of both (which override the methods in
+ * MultimediaControl) to demonstrate polymorphism.</p>
  */
 
 public class MultimediaControlDriver {
 
   /**
    * The main loop of the driver.
+   *
    * @param args A command-line argument passed to the problem.
    */
   public static void main(String[] args) {

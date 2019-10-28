@@ -1,36 +1,38 @@
 package sample;
 
 /**
- * A movie player. It stores the name, manufacturer, screen, and monitor type
- * that belong to this device (see Screen and MonitorType). In addition
- * to these attributes, it has methods for controlling the movie player's
- * playback (see MultimediaControl interface).
+ * A movie player. It stores the name, manufacturer, screen, and monitor type that belong to this
+ * device (see Screen and MonitorType). In addition to these attributes, it has methods for
+ * controlling the movie player's playback (see MultimediaControl interface).
+ *
  * @see Screen
  * @see MonitorType
  * @see MultimediaControl
- *
  */
 public class MoviePlayer extends Product implements MultimediaControl {
 
   /**
-   * The Screen object that belongs to the player. This holds the resolution,
-   * refresh rate, and response rate of the visual display screen.
+   * The Screen object that belongs to the player. This holds the resolution, refresh rate, and
+   * response rate of the visual display screen.
+   *
    * @see Screen
    */
   private Screen screen;
 
   /**
    * The monitor type of the movie player.
+   *
    * @see MonitorType
    */
   private MonitorType monitorType;
 
   /**
    * The default constructor.
-   * @param name The name of the movie player.
+   *
+   * @param name         The name of the movie player.
    * @param manufacturer The manufacturer of the movie player.
-   * @param screen The screen that the movie player has.
-   * @param monitorType The monitor type of the movie screen.
+   * @param screen       The screen that the movie player has.
+   * @param monitorType  The monitor type of the movie screen.
    */
   MoviePlayer(String name, String manufacturer, Screen screen, MonitorType monitorType) {
     super(name);
@@ -87,8 +89,8 @@ public class MoviePlayer extends Product implements MultimediaControl {
   @Override
   public String toString() {
     return
-      super.toString()
-      + "Monitor Type: " + monitorType + "\n"
-      + screen.toString();
+        super.toString()
+            + "Monitor Type: " + monitorType + "\n"
+            + screen.toString();
   }
 }

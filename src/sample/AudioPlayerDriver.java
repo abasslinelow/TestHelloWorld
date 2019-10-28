@@ -8,6 +8,7 @@ public class AudioPlayerDriver {
 
   /**
    * The main loop of the driver.
+   *
    * @param args A command-line argument passed to the problem.
    */
   public static void main(String[] args) {
@@ -17,7 +18,7 @@ public class AudioPlayerDriver {
         "iPod",
         "Apple",
         ItemType.AUDIO_MOBILE.type
-        );
+    );
 
     // Test each function of the AudioPlayer to ensure functionality.
     myPlayer.play();

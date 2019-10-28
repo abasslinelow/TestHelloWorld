@@ -1,9 +1,9 @@
 package sample;
 
 /**
- * Specifies the "type" of a product - that is, whether it is audio-based or
- * visual-based, and whether it is mobile or not. For each type, there is
- * a corresponding "code" which the enum ties to the type.
+ * Specifies the "type" of a product - that is, whether it is audio-based or visual-based, and
+ * whether it is mobile or not. For each type, there is a corresponding "code" which the enum ties
+ * to the type.
  */
 public enum ItemType {
 
@@ -39,6 +39,7 @@ public enum ItemType {
 
   /**
    * Default constructor.
+   *
    * @param type The type of the multimedia product.
    * @param code The code that corresponds to the type.
    */
@@ -49,6 +50,7 @@ public enum ItemType {
 
   /**
    * Gets the media type associated with a given media code.
+   *
    * @param passedCode A media code associated with a media player.
    * @return String The media type associated with the given code.
    */
@@ -64,6 +66,7 @@ public enum ItemType {
 
   /**
    * Gets the media code associated with a given media type.
+   *
    * @param passedType A media type associated with a media player.
    * @return String The media code associated with the given type.
    */

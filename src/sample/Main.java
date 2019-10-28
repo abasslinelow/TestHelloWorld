@@ -1,8 +1,11 @@
 package sample;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,21 +15,29 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+
 /**
- * This program is a simple JavaFX program with 3 tabs and the ability to connect to a
- * database and execute SQL statements. It contains various objects that represent
- * multimedia players and allows the user to catalog these products and their
- * production runs.
+ * This program is a simple JavaFX program with 3 tabs and the ability to connect to a database and
+ * execute SQL statements. It contains various objects that represent multimedia players and allows
+ * the user to catalog these products and their production runs.
+ *
  * @author Todd Bauer
  * @since 9/24/2019
  */
 
 public class Main extends Application {
+
+  // Create a new database manager object for database manipulation.
+  DatabaseManager db = new DatabaseManager("sa", "sa");
 
   /**
    * This holds a list of all products.
@@ -40,6 +51,7 @@ public class Main extends Application {
 
   /**
    * This launches the main loop with any argument given by the user.
+   *
    * @param args An argument passed to the program on runtime.
    */
   public static void main(String[] args) {
@@ -48,6 +60,7 @@ public class Main extends Application {
 
   /**
    * This method creates the GUI elements and serves as the main loop.
+   *
    * @param primaryStage The Stage object to create GUI elements on.
    */
   @Override
@@ -58,6 +71,8 @@ public class Main extends Application {
     populateLists();
 
     primaryStage.setTitle("Product Manager");
+    primaryStage.setWidth(440);
+    primaryStage.setHeight(460);
 
     // Create tabs in the application and do not let the user close them.
     TabPane tabPane = new TabPane();
@@ -85,7 +100,7 @@ public class Main extends Application {
     tabPane.getTabs().add(productionTab);
 
     // Create and show the scene from the TabPane.
-    Scene scene = new Scene(tabPane, 300, 275);
+    Scene scene = new Scene(tabPane, 640, 480);
     primaryStage.setScene(scene);
     scene.getStylesheets().add(Main.class.getResource("Main.css").toExternalForm());
     primaryStage.show();
@@ -180,6 +195,7 @@ public class Main extends Application {
     productPane.add(productTypeLabel, 0, 3);
     ComboBox<ItemType> productTypeCBox =
         new ComboBox<>(FXCollections.observableArrayList(ItemType.values()));
+    productTypeCBox.setPrefWidth(180);
     productPane.add(productTypeCBox, 1, 3);
 
     // Create the Add Product button.
@@ -225,6 +241,7 @@ public class Main extends Application {
 
   private GridPane createProductionPane() {
 
+
     // productionPane pane creation. This will be inserted into the TabPane.
     GridPane productionPane = new GridPane();
     productionPane.setAlignment(Pos.CENTER);
@@ -236,9 +253,35 @@ public class Main extends Application {
     scenetitle.setId("welcome-text");
     productionPane.add(scenetitle, 0, 0, 2, 1);
 
+    // Production table from database.
+    TableView<Production> productionTable = new TableView<>();
+    productionTable.setEditable(true);
+
+    TableColumn<Production, String> productNameCol = new TableColumn<>("Product Name");
+    productNameCol.setStyle("-fx-alignment: CENTER;");
+    productNameCol.setCellValueFactory(
+        new PropertyValueFactory<>("name"));
+
+    TableColumn<Production, Integer> quantityCol = new TableColumn<>("Quantity");
+    quantityCol.setStyle("-fx-alignment: CENTER;");
+    quantityCol.setCellValueFactory(
+        new PropertyValueFactory<>("quantity"));
+
+    TableColumn<Production, Date> manufactureDateCol = new TableColumn<>("Manufacture Date");
+    manufactureDateCol.setStyle("-fx-alignment: CENTER;");
+    manufactureDateCol.setCellValueFactory(
+        new PropertyValueFactory<>("manufactureDate"));
+
+    productionTable.getColumns().add(productNameCol);
+    productionTable.getColumns().add(quantityCol);
+    productionTable.getColumns().add(manufactureDateCol);
+    productionTable.setItems(populateProductionTable());
+    productionTable.setMaxWidth(365);
+    productionPane.add(productionTable, 0, 1, 4, 1);
+
     // Product name ComboBox.
     Label productionNameLabel = new Label("Product Name:");
-    productionPane.add(productionNameLabel, 0, 1);
+    productionPane.add(productionNameLabel, 1, 2);
 
     // Rather than displaying the entire toString() of a product, just show its name.
     ArrayList<String> names = new ArrayList<>();
@@ -248,25 +291,26 @@ public class Main extends Application {
     ComboBox<String> productionNameCBox =
         new ComboBox<>(FXCollections.observableArrayList(names));
 
-    productionPane.add(productionNameCBox, 1, 1);
+    productionNameCBox.setPrefWidth(180);
+    productionPane.add(productionNameCBox, 2, 2);
 
     // Product quantity textfield.
     Label productionQuantityLabel = new Label("Quantity:");
-    productionPane.add(productionQuantityLabel, 0, 2);
+    productionPane.add(productionQuantityLabel, 1, 3);
     TextField productionQuantityTextfield = new TextField();
-    productionPane.add(productionQuantityTextfield, 1, 2);
+    productionPane.add(productionQuantityTextfield, 2, 3);
 
     // Create the Add Product button.
     Button addProductionBtn = new Button("Add Product");
     HBox hbAddProductionBtn = new HBox(10);
     hbAddProductionBtn.setAlignment(Pos.BOTTOM_RIGHT);
     hbAddProductionBtn.getChildren().add(addProductionBtn);
-    productionPane.add(hbAddProductionBtn, 1, 3);
+    productionPane.add(hbAddProductionBtn, 2, 4);
 
     // Create a text label for printing errors and confirmations.
     final Text actiontarget = new Text();
     actiontarget.setId("actiontarget");
-    productionPane.add(actiontarget, 0, 4, 2, 1);
+    productionPane.add(actiontarget, 1, 5, 2, 1);
 
     addProductionBtn.setOnAction(event -> {
 
@@ -309,9 +353,20 @@ public class Main extends Application {
     return productionPane;
   }
 
+  private ObservableList<Production> populateProductionTable() {
+
+    DatabaseManager db = new DatabaseManager("sa", "sa");
+
+    final ObservableList<Production> data =
+        FXCollections.observableArrayList(db.listRowsInProductionTable());
+
+    db.disconnectFromDB();
+
+    return data;
+  }
+
   /**
-   * Populates the productLine and productRun ArrayLists with information
-   * from the database.
+   * Populates the productLine and productRun ArrayLists with information from the database.
    */
   private void populateLists() {
 

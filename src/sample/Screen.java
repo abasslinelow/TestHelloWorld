@@ -1,8 +1,8 @@
 package sample;
 
 /**
- * Stores information about the screen attached to a Product. Specifically,
- * it stores the screen resolution, refresh rate, and response rate.
+ * Stores information about the screen attached to a Product. Specifically, it stores the screen
+ * resolution, refresh rate, and response rate.
  */
 public class Screen implements ScreenSpec {
 
@@ -23,8 +23,9 @@ public class Screen implements ScreenSpec {
 
   /**
    * The default constructor.
-   * @param resolution The screen resolution size.
-   * @param refreshrate The refresh rate (in Hz).
+   *
+   * @param resolution   The screen resolution size.
+   * @param refreshrate  The refresh rate (in Hz).
    * @param responsetime The response time (in ms).
    */
   Screen(String resolution, int refreshrate, int responsetime) {
@@ -35,6 +36,7 @@ public class Screen implements ScreenSpec {
 
   /**
    * Getter for the resolution.
+   *
    * @return String The resolution of the screen.
    */
   @Override
@@ -44,6 +46,7 @@ public class Screen implements ScreenSpec {
 
   /**
    * Getter for the refresh rate.
+   *
    * @return int The refresh rate of the screen.
    */
   @Override
@@ -53,6 +56,7 @@ public class Screen implements ScreenSpec {
 
   /**
    * Getter for the response rate.
+   *
    * @return int The response rate of the screen.
    */
   @Override
@@ -65,14 +69,15 @@ public class Screen implements ScreenSpec {
    * <br>Resolution:
    * <br>Refresh Rate:
    * <br>Response Rate:
+   *
    * @return String The complete formatted string description.
    */
   @Override
   public String toString() {
     return String.format(
-      "Resolution: %s%n"
-      + "Refresh Rate: %s%n"
-      + "Response Rate: %s%n",
-      resolution, refreshrate, responsetime);
+        "Resolution: %s%n"
+            + "Refresh Rate: %s%n"
+            + "Response Rate: %s%n",
+        resolution, refreshrate, responsetime);
   }
 }

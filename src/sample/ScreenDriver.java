@@ -8,6 +8,7 @@ public class ScreenDriver {
 
   /**
    * The main loop of the driver.
+   *
    * @param args A command-line argument passed to the problem.
    */
   public static void main(String[] args) {

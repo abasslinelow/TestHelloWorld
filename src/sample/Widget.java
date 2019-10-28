@@ -7,6 +7,7 @@ class Widget extends Product {
 
   /**
    * Default constructor.
+   *
    * @param name The name of the widget.
    * @param type The type of the widget. (See ItemType enum)
    */
