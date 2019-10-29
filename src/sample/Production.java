@@ -1,10 +1,6 @@
 package sample;
 
 import java.util.Date;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 /**
  * Represents a manufacturing production record of a product.
@@ -92,8 +88,10 @@ public class Production {
    *
    * @return Date The time and date of manufacturing.
    */
-  public Date getManufactureDate() {
-    return manufacturedOn;
+  public Date getManufacturedOn() {
+
+    // Return a new Date so the user cannot modify its contents outside of this method.
+    return new Date(manufacturedOn.getTime());
   }
 
   /**
@@ -101,8 +99,10 @@ public class Production {
    *
    * @param manufacturedOn The time and date of manufacturing.
    */
-  public void setManufactureDate(Date manufacturedOn) {
-    this.manufacturedOn = manufacturedOn;
+  public void setManufacturedOn(Date manufacturedOn) {
+
+    // Return a new Date so the user cannot modify its contents outside of this method.
+    this.manufacturedOn = new Date(manufacturedOn.getTime());
   }
 
   /**

@@ -51,6 +51,16 @@ public abstract class Product implements Item {
   }
 
   /**
+   * Setter for the id of the product.
+   *
+   * @param id The id of the product.
+   */
+  @Override
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  /**
    * Getter for the name of the product.
    *
    * @return String The name of the product.

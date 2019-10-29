@@ -13,6 +13,14 @@ public interface Item {
    */
   int getId();
 
+
+  /**
+   * Sets the ID number of the product.
+   *
+   * @param id The ID number of the product.
+   */
+  void setId(int id);
+
   /**
    * Gets the name of the product.
    *

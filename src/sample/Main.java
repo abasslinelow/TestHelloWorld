@@ -6,6 +6,9 @@ import java.util.Date;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,7 +25,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 /**
@@ -77,27 +79,9 @@ public class Main extends Application {
     // Create tabs in the application and do not let the user close them.
     TabPane tabPane = new TabPane();
     tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
-    // Create a new tab, insert the login pane, then add it to the TabPane.
-    Tab loginTab = new Tab();
-    loginTab.setText("Login");
-    loginTab.setContent(createLoginPane());
-    loginTab.setClosable(false);
-    tabPane.getTabs().add(loginTab);
-
-    // Create the second tab, insert the products pane, then add it to the TabPane.
-    Tab productTab = new Tab();
-    productTab.setText("Products");
-    productTab.setContent(createProductPane());
-    productTab.setClosable(false);
-    tabPane.getTabs().add(productTab);
-
-    // Create the third tab, insert the production pane, then add it to the TabPane.
-    Tab productionTab = new Tab();
-    productionTab.setText("Production");
-    productionTab.setContent(createProductionPane());
-    productionTab.setClosable(false);
-    tabPane.getTabs().add(productionTab);
+    tabPane.getTabs().add(createLoginTab());
+    tabPane.getTabs().add(createProductTab());
+    tabPane.getTabs().add(createProductionTab());
 
     // Create and show the scene from the TabPane.
     Scene scene = new Scene(tabPane, 640, 480);
@@ -106,7 +90,7 @@ public class Main extends Application {
     primaryStage.show();
   }
 
-  private GridPane createLoginPane() {
+  private Tab createLoginTab() {
     // Login pane creation. This will be inserted into the TabPane.
     GridPane loginPane = new GridPane();
     loginPane.setAlignment(Pos.CENTER);
@@ -116,7 +100,8 @@ public class Main extends Application {
 
     Text scenetitle = new Text("Welcome");
     scenetitle.setId("welcome-text");
-    loginPane.add(scenetitle, 0, 0, 2, 1);
+    GridPane.setHalignment(scenetitle, HPos.CENTER);
+    loginPane.add(scenetitle, 0, 0, 3, 1);
 
     Label userName = new Label("User Name:");
     loginPane.add(userName, 0, 1);
@@ -163,10 +148,16 @@ public class Main extends Application {
       }
     });
 
-    return loginPane;
+    // Create the second tab, insert the products pane, then return it.
+    Tab loginTab = new Tab();
+    loginTab.setText("Login");
+    loginTab.setContent(loginPane);
+    loginTab.setClosable(false);
+
+    return loginTab;
   }
 
-  private GridPane createProductPane() {
+  private Tab createProductTab() {
     // productPane pane creation. This will be inserted into the TabPane.
     GridPane productPane = new GridPane();
     productPane.setAlignment(Pos.CENTER);
@@ -174,8 +165,9 @@ public class Main extends Application {
     productPane.setVgap(10);
     productPane.setPadding(new Insets(25, 25, 25, 25));
 
-    Text scenetitle = new Text("Products");
+    Text scenetitle = new Text("Product Line");
     scenetitle.setId("welcome-text");
+    GridPane.setHalignment(scenetitle, HPos.CENTER);
     productPane.add(scenetitle, 0, 0, 2, 1);
 
     // Product name textfield.
@@ -213,6 +205,7 @@ public class Main extends Application {
     addProductBtn.setOnAction(event -> {
 
       Widget userWidget = new Widget(
+          productLine.size() + 1,
           productNameTextfield.getText(),
           productTypeCBox.getValue().type
       );
@@ -223,24 +216,34 @@ public class Main extends Application {
 
       if (db.getConnectionStatus()) {
 
-        db.insertRowIntoProductTable(3, userWidget.getName(),
-            userWidget.getManufacturer(), userWidget.getType());
+        db.insertRowIntoProductTable(
+            userWidget.getId(),
+            userWidget.getName(),
+            userWidget.getManufacturer(),
+            userWidget.getType()
+        );
         productLine.add(userWidget);
 
         db.listRowsInProductsTable();
         db.listColumnsInTable("PRODUCTS");
         db.disconnectFromDB();
+        populateLists();
         actiontarget.setText("Connection to db successful.");
       } else {
         actiontarget.setText("Connection to db failed.\nCheck name and password.");
       }
     });
 
-    return productPane;
+    // Create the second tab, insert the products pane, then add it to the TabPane.
+    Tab productTab = new Tab();
+    productTab.setText("Products");
+    productTab.setContent(productPane);
+    productTab.setClosable(false);
+
+    return productTab;
   }
 
-  private GridPane createProductionPane() {
-
+  private Tab createProductionTab() {
 
     // productionPane pane creation. This will be inserted into the TabPane.
     GridPane productionPane = new GridPane();
@@ -249,14 +252,18 @@ public class Main extends Application {
     productionPane.setVgap(10);
     productionPane.setPadding(new Insets(25, 25, 25, 25));
 
-    Text scenetitle = new Text("Production");
+    Text scenetitle = new Text("Production Run");
     scenetitle.setId("welcome-text");
+    GridPane.setHalignment(scenetitle, HPos.CENTER);
     productionPane.add(scenetitle, 0, 0, 2, 1);
 
     // Production table from database.
     TableView<Production> productionTable = new TableView<>();
     productionTable.setEditable(true);
 
+    // The various columns of the database.  Makes a new column that will draw a String
+    // from a Production object, then tie this to the "name" attribute in a Production.
+    // setCellValueFactory uses reflection to automatically infer the getters and setters.
     TableColumn<Production, String> productNameCol = new TableColumn<>("Product Name");
     productNameCol.setStyle("-fx-alignment: CENTER;");
     productNameCol.setCellValueFactory(
@@ -270,47 +277,51 @@ public class Main extends Application {
     TableColumn<Production, Date> manufactureDateCol = new TableColumn<>("Manufacture Date");
     manufactureDateCol.setStyle("-fx-alignment: CENTER;");
     manufactureDateCol.setCellValueFactory(
-        new PropertyValueFactory<>("manufactureDate"));
+        new PropertyValueFactory<>("manufacturedOn"));
 
     productionTable.getColumns().add(productNameCol);
     productionTable.getColumns().add(quantityCol);
     productionTable.getColumns().add(manufactureDateCol);
     productionTable.setItems(populateProductionTable());
-    productionTable.setMaxWidth(365);
-    productionPane.add(productionTable, 0, 1, 4, 1);
+    productionTable.setMinWidth(365);
+    productionPane.add(productionTable, 0, 1, 2, 1);
 
     // Product name ComboBox.
     Label productionNameLabel = new Label("Product Name:");
-    productionPane.add(productionNameLabel, 1, 2);
+    productionNameLabel.setMinWidth(200);
+    productionNameLabel.setAlignment(Pos.CENTER_RIGHT);
+    productionPane.add(productionNameLabel, 0, 2);
 
     // Rather than displaying the entire toString() of a product, just show its name.
-    ArrayList<String> names = new ArrayList<>();
-    for (Product p : productLine) {
-      names.add(p.getName());
-    }
     ComboBox<String> productionNameCBox =
-        new ComboBox<>(FXCollections.observableArrayList(names));
+        new ComboBox<>(FXCollections.observableArrayList(getNamesOfProducts()));
 
-    productionNameCBox.setPrefWidth(180);
-    productionPane.add(productionNameCBox, 2, 2);
+    productionNameCBox.setPrefWidth(140);
+    GridPane.setHalignment(productionNameCBox, HPos.RIGHT);
+    productionPane.add(productionNameCBox, 1, 2);
 
     // Product quantity textfield.
     Label productionQuantityLabel = new Label("Quantity:");
-    productionPane.add(productionQuantityLabel, 1, 3);
+    productionQuantityLabel.setMinWidth(200);
+    productionQuantityLabel.setAlignment(Pos.CENTER_RIGHT);
+    productionPane.add(productionQuantityLabel, 0, 3);
     TextField productionQuantityTextfield = new TextField();
-    productionPane.add(productionQuantityTextfield, 2, 3);
+    productionQuantityTextfield.setAlignment(Pos.CENTER_RIGHT);
+    GridPane.setHalignment(productionQuantityTextfield, HPos.RIGHT);
+    productionQuantityTextfield.setMaxWidth(140);
+    productionPane.add(productionQuantityTextfield, 1, 3);
 
     // Create the Add Product button.
     Button addProductionBtn = new Button("Add Product");
     HBox hbAddProductionBtn = new HBox(10);
     hbAddProductionBtn.setAlignment(Pos.BOTTOM_RIGHT);
     hbAddProductionBtn.getChildren().add(addProductionBtn);
-    productionPane.add(hbAddProductionBtn, 2, 4);
+    productionPane.add(hbAddProductionBtn, 1, 4);
 
     // Create a text label for printing errors and confirmations.
     final Text actiontarget = new Text();
     actiontarget.setId("actiontarget");
-    productionPane.add(actiontarget, 1, 5, 2, 1);
+    productionPane.add(actiontarget, 0, 5, 2, 1);
 
     addProductionBtn.setOnAction(event -> {
 
@@ -326,22 +337,20 @@ public class Main extends Application {
           );
           productionRun.add(productionRecord);
 
+
           // Create a new database manager object for database manipulation.
           DatabaseManager db = new DatabaseManager("sa", "sa");
 
           if (db.getConnectionStatus()) {
-
             db.insertRowIntoProductionTable(
-                3,
                 productionRecord.getName(),
                 productionRecord.getQuantity(),
-                productionRecord.getManufactureDate()
+                productionRecord.getManufacturedOn()
             );
-
             db.listRowsInProductionTable();
-
             db.disconnectFromDB();
 
+            productionTable.setItems(populateProductionTable());
             actiontarget.setText("Connection successful.");
           } else {
             actiontarget.setText("Connection to db failed.\nCheck name and password.");
@@ -350,7 +359,24 @@ public class Main extends Application {
       }
     });
 
-    return productionPane;
+
+    // Create the second tab, insert the products pane, then return it.
+    Tab productionTab = new Tab();
+    productionTab.setText("Productions");
+    productionTab.setContent(productionPane);
+    productionTab.setClosable(false);
+
+    // Set an event handler for when the tab is focused. This will refresh all
+    // lists as well as repopulate the Product Name ComboBox and database table.
+    productionTab.setOnSelectionChanged(event -> {
+      if (productionTab.isSelected()) {
+        populateLists();
+        productionNameCBox.setItems(FXCollections.observableArrayList(getNamesOfProducts()));
+        productionTable.setItems(populateProductionTable());
+      }
+    });
+
+    return productionTab;
   }
 
   private ObservableList<Production> populateProductionTable() {
@@ -373,8 +399,23 @@ public class Main extends Application {
     DatabaseManager db = new DatabaseManager("sa", "sa");
     productLine = db.listRowsInProductsTable();
     productionRun = db.listRowsInProductionTable();
+    db.disconnectFromDB();
 
     System.out.print(productLine + "\n\n");
     System.out.print(productionRun + "\n\n");
+  }
+
+  /**
+   * Populates the ComboBox with the names of all current products.
+   * @return ArrayList Strings of all product names in the productLine ArrayList.
+   */
+  private ArrayList<String> getNamesOfProducts() {
+    // Rather than displaying the entire toString() of a product, just show its name.
+    ArrayList<String> names = new ArrayList<>();
+    for (Product p : productLine) {
+      names.add(p.getName());
+    }
+
+    return names;
   }
 }

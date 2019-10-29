@@ -232,18 +232,18 @@ public class DatabaseManager {
   /**
    * Insert new rows into the PRODUCTION table.
    *
-   * @param id             The unique ID number of the row entry.
    * @param name           The name of the product in the row entry.
    * @param quantity       The amount of products that were manufactured.
    * @param manufacturedOn The date and time the products were manufactured.
    */
-  void insertRowIntoProductionTable(int id, String name, int quantity, Date manufacturedOn) {
+  void insertRowIntoProductionTable(String name, int quantity, Date manufacturedOn) {
 
     System.out.println("Inserting records into table...");
+    
     try {
       ps = conn.prepareStatement(
           "INSERT INTO PRODUCTION VALUES ("
-              + id + ", '"
+              + "default, '"
               + name + "', '"
               + quantity + "', '"
               + new Timestamp(manufacturedOn.getTime())

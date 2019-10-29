@@ -15,4 +15,13 @@ class Widget extends Product {
     super(name);
     setType(ItemType.AUDIO.type);
   }
+
+  /**
+   * Overloaded constructor that allows the product ID to be set.
+   */
+  Widget(int id, String name, String type) {
+    super(name);
+    setId(id);
+    setType(ItemType.AUDIO.type);
+  }
 }
