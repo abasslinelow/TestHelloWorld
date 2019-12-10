@@ -1,13 +1,10 @@
 package sample;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -72,9 +69,42 @@ public class Main extends Application {
     // corresponding rows in the PRODUCT and PRODUCTION database tables.
     populateLists();
 
+    System.out.println();
+    System.out.println("PRODUCT LINE:");
+    print(productLine);
+
+    System.out.println();
+    System.out.println("PRODUCTION RUN:");
+    print(productionRun);
+    System.out.println();
+
+    productLine.sort(Product.ProductNameComparator);
+    productionRun.sort(Production.ProductionNameComparator);
+
+    System.out.println();
+    System.out.println("PRODUCT LINE - SORTED:");
+    print(productLine);
+
+    System.out.println();
+    System.out.println("PRODUCTION RUN - SORTED:");
+    print(productionRun);
+    System.out.println();
+
+    System.out.println("ONLY AUDIO DEVICES:");
+    Product.printType(productLine, ItemType.AUDIO);
+
+    System.out.println("ONLY AUDIO_MOBILE DEVICES:");
+    Product.printType(productLine, ItemType.AUDIO_MOBILE);
+
+    System.out.println("ONLY VISUAL DEVICES:");
+    Product.printType(productLine, ItemType.VISUAL);
+
+    System.out.println("ONLY VISUAL_MOBILE DEVICES:");
+    Product.printType(productLine, ItemType.VISUAL_MOBILE);
+
     primaryStage.setTitle("Product Manager");
-    primaryStage.setWidth(440);
-    primaryStage.setHeight(460);
+    primaryStage.setWidth(512);
+    primaryStage.setHeight(480);
 
     // Create tabs in the application and do not let the user close them.
     TabPane tabPane = new TabPane();
@@ -90,6 +120,11 @@ public class Main extends Application {
     primaryStage.show();
   }
 
+  /**
+   * Creates the contents of the login tab.
+   *
+   * @return The login tab.
+   */
   private Tab createLoginTab() {
     // Login pane creation. This will be inserted into the TabPane.
     GridPane loginPane = new GridPane();
@@ -157,6 +192,11 @@ public class Main extends Application {
     return loginTab;
   }
 
+  /**
+   * Creates the contents of the product tab.
+   *
+   * @return The product tab.
+   */
   private Tab createProductTab() {
     // productPane pane creation. This will be inserted into the TabPane.
     GridPane productPane = new GridPane();
@@ -202,30 +242,123 @@ public class Main extends Application {
     actiontarget.setId("actiontarget");
     productPane.add(actiontarget, 0, 5, 2, 1);
 
-    addProductBtn.setOnAction(event -> {
+    // Movie player screen properties. Only show if a movie player is selected.
+    // Monitor type selector.
+    Label monitorTypeLabel = new Label("Monitor Type:");
+    productPane.add(monitorTypeLabel, 0, 5);
+    ComboBox<MonitorType> monitorTypeCBox =
+        new ComboBox<>(FXCollections.observableArrayList(MonitorType.values()));
+    productTypeCBox.setPrefWidth(180);
+    productPane.add(monitorTypeCBox, 1, 5);
+    monitorTypeLabel.setVisible(false);
+    monitorTypeCBox.setVisible(false);
 
-      Widget userWidget = new Widget(
-          productLine.size() + 1,
-          productNameTextfield.getText(),
-          productTypeCBox.getValue().type
-      );
-      userWidget.setManufacturer(productManufacturerTextfield.getText());
+    // Screen resolution Textfield.
+    Label resolutionLabel = new Label("Screen resolution (e.g. 800x600):");
+    productPane.add(resolutionLabel, 0, 6);
+    TextField resolutionTextfield = new TextField();
+    productPane.add(resolutionTextfield, 1, 6);
+    resolutionLabel.setVisible(false);
+    resolutionTextfield.setVisible(false);
+
+    // Refresh rate Textfield.
+    Label refreshRateLabel = new Label("Refresh rate (Hz): ");
+    productPane.add(refreshRateLabel, 0, 7);
+    TextField refreshRateTextfield = new TextField();
+    productPane.add(refreshRateTextfield, 1, 7);
+    refreshRateLabel.setVisible(false);
+    refreshRateTextfield.setVisible(false);
+
+    // Response time Textfield.
+    Label responseTimeLabel = new Label("Response time (ms): ");
+    productPane.add(responseTimeLabel, 0, 8);
+    TextField responseTimeTextfield = new TextField();
+    productPane.add(responseTimeTextfield, 1, 8);
+    responseTimeLabel.setVisible(false);
+    responseTimeTextfield.setVisible(false);
+
+    productTypeCBox.setOnAction(event -> {
+      if (productTypeCBox.getValue() == ItemType.VISUAL
+          || productTypeCBox.getValue() == ItemType.VISUAL_MOBILE) {
+        resolutionLabel.setVisible(true);
+        resolutionTextfield.setVisible(true);
+        refreshRateLabel.setVisible(true);
+        refreshRateTextfield.setVisible(true);
+        responseTimeLabel.setVisible(true);
+        responseTimeTextfield.setVisible(true);
+        monitorTypeLabel.setVisible(true);
+        monitorTypeCBox.setVisible(true);
+        GridPane.setRowIndex(hbAddProductBtn, 9);
+        GridPane.setRowIndex(actiontarget, 10);
+      } else {
+        resolutionLabel.setVisible(false);
+        resolutionTextfield.setVisible(false);
+        resolutionTextfield.setText("");
+        refreshRateLabel.setVisible(false);
+        refreshRateTextfield.setVisible(false);
+        refreshRateTextfield.setText("");
+        responseTimeLabel.setVisible(false);
+        responseTimeTextfield.setVisible(false);
+        responseTimeTextfield.setText("");
+        monitorTypeLabel.setVisible(false);
+        monitorTypeCBox.setVisible(false);
+        GridPane.setRowIndex(hbAddProductBtn, 4);
+        GridPane.setRowIndex(actiontarget, 5);
+      }
+    });
+
+    addProductBtn.setOnAction(event -> {
 
       // Create a new database manager object for database manipulation.
       DatabaseManager db = new DatabaseManager("sa", "sa");
 
+      // Establish a connection to the database.
       if (db.getConnectionStatus()) {
 
-        db.insertRowIntoProductTable(
-            userWidget.getId(),
-            userWidget.getName(),
-            userWidget.getManufacturer(),
-            userWidget.getType()
-        );
-        productLine.add(userWidget);
+        // Determine whether the product is movie player or an audio player.
+        if (hasScreen(productTypeCBox.getValue())) {
 
-        db.listRowsInProductsTable();
-        db.listColumnsInTable("PRODUCTS");
+          // If movie player, make a screen, make the product, then add to database.
+          Screen screen = new Screen(
+              resolutionTextfield.getText(),
+              Integer.parseInt(refreshRateTextfield.getText()),
+              Integer.parseInt(responseTimeTextfield.getText())
+          );
+          MoviePlayer product = new MoviePlayer(
+              productNameTextfield.getText(),
+              productManufacturerTextfield.getText(),
+              productTypeCBox.getValue().type,
+              screen,
+              monitorTypeCBox.getValue()
+          );
+          db.insertRowIntoProductTable(
+              product.getName(),
+              product.getManufacturer(),
+              product.getType(),
+              product.getScreen().getResolution(),
+              product.getScreen().getRefreshRate(),
+              product.getScreen().getResponseTime(),
+              product.getMonitorType()
+          );
+          productLine.add(product);
+        } else {
+
+          // Else there is no screen, just make the product and add to database.
+          AudioPlayer product = new AudioPlayer(
+              productNameTextfield.getText(),
+              productManufacturerTextfield.getText(),
+              productTypeCBox.getValue().type
+          );
+
+          db.insertRowIntoProductTable(
+              product.getName(),
+              product.getManufacturer(),
+              product.getType()
+          );
+          productLine.add(product);
+        }
+
+        // Disconnect from the database and repopulate the lists to reflect the new product.
         db.disconnectFromDB();
         populateLists();
         actiontarget.setText("Connection to db successful.");
@@ -243,6 +376,26 @@ public class Main extends Application {
     return productTab;
   }
 
+  /**
+   * Determines if a product has a screen.
+   * @param type The type of product (Audio, AudioMobile, Visual, VisualMobile)
+   * @return boolean True if has a screen, false if not.
+   */
+  private boolean hasScreen(ItemType type) {
+    switch (type) {
+      case VISUAL:
+      case VISUAL_MOBILE:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Creates the contents of the production tab.
+   *
+   * @return The production tab.
+   */
   private Tab createProductionTab() {
 
     // productionPane pane creation. This will be inserted into the TabPane.
@@ -250,12 +403,12 @@ public class Main extends Application {
     productionPane.setAlignment(Pos.CENTER);
     productionPane.setHgap(10);
     productionPane.setVgap(10);
-    productionPane.setPadding(new Insets(25, 25, 25, 25));
+    productionPane.setPadding(new Insets(15, 25, 25, 15));
 
     Text scenetitle = new Text("Production Run");
     scenetitle.setId("welcome-text");
     GridPane.setHalignment(scenetitle, HPos.CENTER);
-    productionPane.add(scenetitle, 0, 0, 2, 1);
+    productionPane.add(scenetitle, 0, 0, 4, 1);
 
     // Production table from database.
     TableView<Production> productionTable = new TableView<>();
@@ -268,29 +421,35 @@ public class Main extends Application {
     productNameCol.setStyle("-fx-alignment: CENTER;");
     productNameCol.setCellValueFactory(
         new PropertyValueFactory<>("name"));
+    productionTable.getColumns().add(productNameCol);
+
+    TableColumn<Production, String> manufacturerCol = new TableColumn<>("Manufacturer");
+    manufacturerCol.setStyle("-fx-alignment: CENTER;");
+    manufacturerCol.setCellValueFactory(
+        new PropertyValueFactory<>("manufacturer"));
+    productionTable.getColumns().add(manufacturerCol);
 
     TableColumn<Production, Integer> quantityCol = new TableColumn<>("Quantity");
     quantityCol.setStyle("-fx-alignment: CENTER;");
     quantityCol.setCellValueFactory(
         new PropertyValueFactory<>("quantity"));
+    productionTable.getColumns().add(quantityCol);
 
     TableColumn<Production, Date> manufactureDateCol = new TableColumn<>("Manufacture Date");
     manufactureDateCol.setStyle("-fx-alignment: CENTER;");
     manufactureDateCol.setCellValueFactory(
         new PropertyValueFactory<>("manufacturedOn"));
-
-    productionTable.getColumns().add(productNameCol);
-    productionTable.getColumns().add(quantityCol);
     productionTable.getColumns().add(manufactureDateCol);
+
+    productionTable.setMinWidth(467);
     productionTable.setItems(populateProductionTable());
-    productionTable.setMinWidth(365);
-    productionPane.add(productionTable, 0, 1, 2, 1);
+    productionPane.add(productionTable, 0, 1, 4, 1);
 
     // Product name ComboBox.
     Label productionNameLabel = new Label("Product Name:");
-    productionNameLabel.setMinWidth(200);
+    productionNameLabel.setMinWidth(300);
     productionNameLabel.setAlignment(Pos.CENTER_RIGHT);
-    productionPane.add(productionNameLabel, 0, 2);
+    productionPane.add(productionNameLabel, 2, 2);
 
     // Rather than displaying the entire toString() of a product, just show its name.
     ComboBox<String> productionNameCBox =
@@ -298,30 +457,25 @@ public class Main extends Application {
 
     productionNameCBox.setPrefWidth(140);
     GridPane.setHalignment(productionNameCBox, HPos.RIGHT);
-    productionPane.add(productionNameCBox, 1, 2);
+    productionPane.add(productionNameCBox, 3, 2);
 
     // Product quantity textfield.
     Label productionQuantityLabel = new Label("Quantity:");
-    productionQuantityLabel.setMinWidth(200);
+    productionQuantityLabel.setMinWidth(300);
     productionQuantityLabel.setAlignment(Pos.CENTER_RIGHT);
-    productionPane.add(productionQuantityLabel, 0, 3);
+    productionPane.add(productionQuantityLabel, 2, 3);
     TextField productionQuantityTextfield = new TextField();
     productionQuantityTextfield.setAlignment(Pos.CENTER_RIGHT);
     GridPane.setHalignment(productionQuantityTextfield, HPos.RIGHT);
     productionQuantityTextfield.setMaxWidth(140);
-    productionPane.add(productionQuantityTextfield, 1, 3);
+    productionPane.add(productionQuantityTextfield, 3, 3);
 
     // Create the Add Product button.
     Button addProductionBtn = new Button("Add Product");
     HBox hbAddProductionBtn = new HBox(10);
     hbAddProductionBtn.setAlignment(Pos.BOTTOM_RIGHT);
     hbAddProductionBtn.getChildren().add(addProductionBtn);
-    productionPane.add(hbAddProductionBtn, 1, 4);
-
-    // Create a text label for printing errors and confirmations.
-    final Text actiontarget = new Text();
-    actiontarget.setId("actiontarget");
-    productionPane.add(actiontarget, 0, 5, 2, 1);
+    productionPane.add(hbAddProductionBtn, 3, 4);
 
     addProductionBtn.setOnAction(event -> {
 
@@ -351,9 +505,6 @@ public class Main extends Application {
             db.disconnectFromDB();
 
             productionTable.setItems(populateProductionTable());
-            actiontarget.setText("Connection successful.");
-          } else {
-            actiontarget.setText("Connection to db failed.\nCheck name and password.");
           }
         }
       }
@@ -379,6 +530,11 @@ public class Main extends Application {
     return productionTab;
   }
 
+  /**
+   * Populates the Production table with the contents of the Production database table.
+   *
+   * @return ObservableList The contents of the Production table in the database.
+   */
   private ObservableList<Production> populateProductionTable() {
 
     DatabaseManager db = new DatabaseManager("sa", "sa");
@@ -400,9 +556,6 @@ public class Main extends Application {
     productLine = db.listRowsInProductsTable();
     productionRun = db.listRowsInProductionTable();
     db.disconnectFromDB();
-
-    System.out.print(productLine + "\n\n");
-    System.out.print(productionRun + "\n\n");
   }
 
   /**
@@ -417,5 +570,18 @@ public class Main extends Application {
     }
 
     return names;
+  }
+
+  /**
+   * Iterates through an ArrayList and prints all of the elements. This should work with
+   * any of the Collections within this project.
+   *
+   * @param list The ArrayList to iterate through.
+   */
+  private void print(ArrayList list) {
+    for (int i = 0; i < list.size(); i++) {
+      System.out.print(list.get(i).toString());
+      System.out.println("--------------------");
+    }
   }
 }

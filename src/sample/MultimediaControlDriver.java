@@ -33,6 +33,7 @@ public class MultimediaControlDriver {
     MultimediaControl myMoviePlayer = new MoviePlayer(
         "iPhone X",
         "Apple",
+        ItemType.VISUAL.type,
         new Screen("2436x1125", 120, 5),
         MonitorType.LED
     );

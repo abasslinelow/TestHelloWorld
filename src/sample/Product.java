@@ -1,5 +1,8 @@
 package sample;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 /**
  * Contains a generic Product class that is used abstractly as a template for specific products. See
  * AudioPlayer and MoviePlayer for examples of specific products.
@@ -118,6 +121,18 @@ public abstract class Product implements Item {
     this.type = type;
   }
 
+  /**
+   * Prints out products by item type.
+   * @param productLine An ArrayList of products.
+   * @param type The ItemType to filter by.
+   */
+  public static void printType(ArrayList<Product> productLine, ItemType type) {
+    for (Product p : productLine) {
+      if (p.getType().equals(type.type)) {
+        System.out.println(p);
+      }
+    }
+  }
 
   /**
    * Overrides the toString() method to display the details of an object that inherits the Product
@@ -136,4 +151,16 @@ public abstract class Product implements Item {
             + "Type: %s%n",
         name, manufacturer, type);
   }
+
+  /**
+   * Compares the names of two productions for purposes of sorting. Used with Collections.sort
+   * to sort alphabetically.
+   * Source: https://beginnersbook.com/2013/12/java-arraylist-of-object-sort-example-comparable-and-comparator/
+   */
+  static Comparator<Product> ProductNameComparator = (Product p1, Product p2) -> {
+    String name1 = p1.getName();
+    String name2 = p2.getName();
+
+    return name1.compareTo(name2);
+  };
 }

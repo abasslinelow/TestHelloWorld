@@ -31,15 +31,35 @@ public class MoviePlayer extends Product implements MultimediaControl {
    *
    * @param name         The name of the movie player.
    * @param manufacturer The manufacturer of the movie player.
+   * @param type         The type of the player as defined in ItemType.
    * @param screen       The screen that the movie player has.
    * @param monitorType  The monitor type of the movie screen.
    */
-  MoviePlayer(String name, String manufacturer, Screen screen, MonitorType monitorType) {
+  MoviePlayer(String name, String manufacturer, String type,
+      Screen screen, MonitorType monitorType) {
     super(name);
     this.screen = screen;
     this.monitorType = monitorType;
     setManufacturer(manufacturer);
-    setType(ItemType.VISUAL.code);
+    setType(type);
+  }
+
+  /**
+   * Returns the screen that is attached to the movie player.
+   *
+   * @return Screen The screen attached to the movie player.
+   */
+  Screen getScreen() {
+    return screen;
+  }
+
+  /**
+   * Returns the monitor type of the movie player.
+   *
+   * @return MonitorType The type of monitor attached to the movie player.
+   */
+  MonitorType getMonitorType() {
+    return monitorType;
   }
 
   /**

@@ -17,10 +17,11 @@ public class MoviePlayerDriver {
     MoviePlayer myPlayer = new MoviePlayer(
         "myPlayer",
         "Mypple",
+        ItemType.VISUAL.type,
         new Screen("800 x 1280", 60, 10),
         MonitorType.LED
     );
-    myPlayer.setType(ItemType.VISUAL_MOBILE.code);
+    myPlayer.setType(ItemType.VISUAL_MOBILE.type);
 
     // Test each function of the MoviePlayer to ensure functionality.
     myPlayer.play();

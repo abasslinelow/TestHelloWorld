@@ -43,8 +43,8 @@ public class AudioPlayer extends Product implements MultimediaControl {
     // as the type attribute in the Product superclass.
     // NOTE: I would prefer to pass the media type directly into the constructor, but
     // I am not sure if this will invalidate automatic testing.
-    mediaType = ItemType.getCodeFromType(audioSpecification);
-    setType(mediaType);
+    this.mediaType = ItemType.getCodeFromType(audioSpecification);
+    setType(audioSpecification);
   }
 
   /**
@@ -90,7 +90,7 @@ public class AudioPlayer extends Product implements MultimediaControl {
    */
   @Override
   public String toString() {
-    return super.toString() + String.format("Audio Spec: %s%n",
-        audioSpecification);
+    return super.toString() + String.format("Media Type: %s%n",
+        mediaType);
   }
 }

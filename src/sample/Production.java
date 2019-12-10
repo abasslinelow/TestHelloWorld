@@ -1,5 +1,6 @@
 package sample;
 
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -106,6 +107,24 @@ public class Production {
   }
 
   /**
+   * Getter for the manufacturer of the product.
+   *
+   * @return String The name of the product manufacturer.
+   */
+  public String getManufacturer() {
+    return product.getManufacturer();
+  }
+
+  /**
+   * Setter for the manufacture date.
+   *
+   * @param manufacturer The manufacturer of the product.
+   */
+  public void setManufacturer(String manufacturer) {
+    product.setManufacturer(manufacturer);
+  }
+
+  /**
    * Overrides the toString() method so it returns the values of all attributes.
    *
    * @return String Contains a full description of the production in the following format
@@ -118,4 +137,16 @@ public class Production {
     return String.format("Product Name: %s%nQuantity: %d%nManufacture Date: %tc%n",
         product.getName(), quantity, manufacturedOn);
   }
+
+  /**
+   * Compares the names of two productions for purposes of sorting. Used with Collections.sort
+   * to sort alphabetically.
+   * Source: https://beginnersbook.com/2013/12/java-arraylist-of-object-sort-example-comparable-and-comparator/
+   */
+  static Comparator<Production> ProductionNameComparator = (Production p1, Production p2) -> {
+    String name1 = p1.getName();
+    String name2 = p2.getName();
+
+    return name1.compareTo(name2);
+  };
 }
